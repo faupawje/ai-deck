@@ -11,12 +11,12 @@
 
 Set up the Next.js project with all dependencies.
 
-- [ ] `npx create-next-app@latest` with App Router + TypeScript + Tailwind
-- [ ] Install core deps: `ai`, `@ai-sdk/google`, `better-sqlite3`
-- [ ] Install UI deps: `shadcn/ui` init, add components (button, input, card, badge, scroll-area)
-- [ ] Install types: `@types/better-sqlite3`
-- [ ] Create `.env.example` with `GOOGLE_GENERATIVE_AI_API_KEY=`
-- [ ] Verify dev server runs
+- [x] `npx create-next-app@latest` with App Router + TypeScript + Tailwind
+- [x] Install core deps: `ai`, `@ai-sdk/google`, `better-sqlite3`, `zod`, `lucide-react`, `clsx`, `tailwind-merge`
+- [x] Install UI deps & utilities (`lib/utils.ts`)
+- [x] Install types: `@types/better-sqlite3`
+- [x] Create `.env.example` with `GOOGLE_GENERATIVE_AI_API_KEY=`
+- [x] Verify dev server / build runs
 
 ---
 
