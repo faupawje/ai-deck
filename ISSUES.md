@@ -42,16 +42,16 @@ Create the database schema and query helpers.
 
 Define the tools (function declarations) that Gemini can call to interact with project data.
 
-- [ ] Create `lib/tools.ts`
-- [ ] Tool: `create_project` — creates a new project
-- [ ] Tool: `list_projects` — returns all projects
-- [ ] Tool: `create_tasks` — bulk-create tasks for a project
-- [ ] Tool: `list_tasks` — returns tasks for a project, with optional filters
-- [ ] Tool: `update_task` — update status/priority/assignee of a task
-- [ ] Tool: `delete_task` — remove a task
-- [ ] Tool: `show_board` — returns tasks grouped by status (for Kanban rendering)
-- [ ] Tool: `show_summary` — returns project stats (total, done, in-progress, overdue)
-- [ ] Each tool has: description, Zod schema for parameters, execute function that calls db
+- [x] Create `lib/tools.ts`
+- [x] Tool: `create_project` — creates a new project
+- [x] Tool: `list_projects` — returns all projects
+- [x] Tool: `create_tasks` — bulk-create tasks for a project
+- [x] Tool: `list_tasks` — returns tasks for a project, with optional filters
+- [x] Tool: `update_task` — update status/priority/assignee of a task
+- [x] Tool: `delete_task` — remove a task
+- [x] Tool: `show_board` — returns tasks grouped by status (for Kanban rendering)
+- [x] Tool: `show_summary` — returns project stats (total, done, in-progress, overdue)
+- [x] Each tool has: description, Zod schema for parameters, execute function that calls db
 
 ---
 
