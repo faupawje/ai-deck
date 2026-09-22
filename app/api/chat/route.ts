@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     const { messages, projectId }: { messages: UIMessage[]; projectId?: string } = await req.json();
 
     const systemPrompt = buildSystemPrompt(projectId);
-    const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+    const modelName = process.env.GEMINI_MODEL || "gemini-3.6-flash";
 
     const result = streamText({
       model: google(modelName),
