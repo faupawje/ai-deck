@@ -20,6 +20,7 @@ import { TaskList } from "./generative/task-list";
 import { KanbanBoard } from "./generative/kanban-board";
 import { ProjectCard } from "./generative/project-card";
 import { SummaryChart } from "./generative/summary-chart";
+import { MarkdownRenderer } from "./markdown-renderer";
 
 export function Chat() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -249,13 +250,13 @@ export function Chat() {
         </div>
 
         {/* Footer info */}
-        <div className="px-2 pt-3 border-t border-zinc-800/80 text-[11px] text-zinc-500 flex items-center justify-between">
-          <span>Gemini 2.5 Flash + SQLite</span>
+        <div className="px-2 pt-3 pb-2 border-t border-zinc-800/80 text-[11px] text-zinc-500 flex items-center justify-between">
+          <span className="font-mono text-[10px]">Gemini 3.6 Flash + SQLite</span>
           <button
             type="button"
             onClick={fetchProjects}
             title="Refresh database"
-            className="hover:text-zinc-300 transition"
+            className="hover:text-zinc-300 transition p-1"
           >
             <RefreshCw className="h-3 w-3" />
           </button>
@@ -343,29 +344,44 @@ export function Chat() {
                     {message.parts.map((part, pIdx) => {
                       // Text parts
                       if (part.type === "text") {
+                        if (isUser) {
+                          return (
+                            <div
+                              key={pIdx}
+                              className="inline-block rounded-2xl px-4 py-2.5 text-xs md:text-sm leading-relaxed bg-indigo-600 text-white shadow-md text-left"
+                            >
+                              {part.text}
+                            </div>
+                          );
+                        }
+
                         return (
                           <div
                             key={pIdx}
-                            className={`inline-block rounded-2xl px-4 py-2.5 text-xs md:text-sm leading-relaxed whitespace-pre-wrap text-left ${
-                              isUser
-                                ? "bg-indigo-600 text-white shadow-md"
-                                : "bg-zinc-900 text-zinc-200 border border-zinc-800"
-                            }`}
+                            className="rounded-2xl px-4 py-3 bg-zinc-900 text-zinc-200 border border-zinc-800/90 shadow-md text-left max-w-2xl"
                           >
-                            {part.text}
+                            <MarkdownRenderer content={part.text} />
                           </div>
                         );
                       }
 
+                      // Helper to identify tool name and output across all AI SDK representations
+                      let toolName = "";
+                      if (typeof part.type === "string" && part.type.startsWith("tool-")) {
+                        toolName = part.type.replace("tool-", "");
+                      } else if ((part as any).toolName) {
+                        toolName = (part as any).toolName;
+                      }
+
+                      const rawPart = part as any;
+                      const output = rawPart.output ?? rawPart.result ?? null;
+                      const isAvailable = rawPart.state === "output-available" || output !== null;
+
                       // Generative UI: create_tasks or list_tasks
-                      if (
-                        part.type === "tool-create_tasks" ||
-                        part.type === "tool-list_tasks"
-                      ) {
-                        if (part.state === "output-available") {
-                          const output = part.output as any;
+                      if (toolName === "create_tasks" || toolName === "list_tasks") {
+                        if (isAvailable && output) {
                           return (
-                            <div key={pIdx} className="text-left">
+                            <div key={pIdx} className="text-left w-full">
                               <TaskList
                                 tasks={output.tasks || []}
                                 projectName={output.projectName}
@@ -387,9 +403,8 @@ export function Chat() {
                       }
 
                       // Generative UI: show_board
-                      if (part.type === "tool-show_board") {
-                        if (part.state === "output-available") {
-                          const output = part.output as any;
+                      if (toolName === "show_board") {
+                        if (isAvailable && output) {
                           return (
                             <div key={pIdx} className="text-left w-full">
                               <KanbanBoard
@@ -420,12 +435,8 @@ export function Chat() {
                       }
 
                       // Generative UI: create_project or list_projects
-                      if (
-                        part.type === "tool-create_project" ||
-                        part.type === "tool-list_projects"
-                      ) {
-                        if (part.state === "output-available") {
-                          const output = part.output as any;
+                      if (toolName === "create_project" || toolName === "list_projects") {
+                        if (isAvailable && output) {
                           if (output.project) {
                             return (
                               <div key={pIdx} className="text-left">
@@ -461,9 +472,8 @@ export function Chat() {
                       }
 
                       // Generative UI: show_summary
-                      if (part.type === "tool-show_summary") {
-                        if (part.state === "output-available") {
-                          const output = part.output as any;
+                      if (toolName === "show_summary") {
+                        if (isAvailable && output) {
                           return (
                             <div key={pIdx} className="text-left">
                               <SummaryChart

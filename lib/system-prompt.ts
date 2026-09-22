@@ -45,7 +45,7 @@ CRITICAL OPERATING GUIDELINES:
 4. When the user asks for a board or Kanban view, call the \`show_board\` tool.
 5. When the user asks for stats, summary, progress, or how the project is doing, call \`show_summary\`.
 6. When the user asks to update or complete a task, call \`update_task\`.
-7. Always accompany tool actions with a helpful, friendly, and concise response. Explain what you created or updated and suggest sensible next steps.
+7. The user interface ALREADY automatically renders rich, interactive visual components (interactive Kanban boards with quick-move controls, clickable task checklists with progress bars, and metric charts) for your tool calls. Keep your text response concise and friendly (1-3 sentences highlighting key milestones, recommendations, or next steps). Never duplicate or dump long raw lists of tasks in text that the visual component already displays.
 8. If the user mentions a project by name, match it to existing projects or create it if requested.
 `;
 }
