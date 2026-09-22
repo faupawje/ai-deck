@@ -48,7 +48,7 @@ export function Chat() {
     fetchProjects();
   }, []);
 
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage, status, error } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
       body: {
@@ -510,6 +510,20 @@ export function Chat() {
                 <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 animate-bounce" />
                 <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:0.2s]" />
                 <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:0.4s]" />
+              </div>
+            </div>
+          )}
+
+          {error && (
+            <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-xs text-rose-300 max-w-xl mx-auto flex items-start gap-3">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-500/20 text-rose-400 font-bold flex-shrink-0">
+                !
+              </span>
+              <div className="space-y-1">
+                <p className="font-semibold text-rose-200">Notice:</p>
+                <p className="leading-relaxed">
+                  {error.message || "Failed to communicate with AI server. Please check your GOOGLE_GENERATIVE_AI_API_KEY in .env.local"}
+                </p>
               </div>
             </div>
           )}

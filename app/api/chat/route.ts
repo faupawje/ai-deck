@@ -15,6 +15,20 @@ export const maxDuration = 60;
 
 export async function POST(req: Request) {
   try {
+    const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+    if (!apiKey || apiKey === "your_gemini_api_key_here") {
+      return new Response(
+        JSON.stringify({
+          error:
+            "Missing Gemini API Key. Please add your GOOGLE_GENERATIVE_AI_API_KEY in .env.local and restart the server.",
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
     const { messages, projectId }: { messages: UIMessage[]; projectId?: string } = await req.json();
 
     const systemPrompt = buildSystemPrompt(projectId);

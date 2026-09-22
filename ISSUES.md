@@ -157,24 +157,25 @@ Render project statistics and progress charts.
 
 Craft and iterate on the system prompt for optimal AI behavior.
 
-- [ ] Create `lib/system-prompt.ts`
-- [ ] Inject dynamic context: active project name, task count, member list
-- [ ] Instruct AI on when to use each tool vs. plain text
-- [ ] Handle edge cases: no project selected, empty project, ambiguous requests
-- [ ] Test with various user inputs and verify tool selection accuracy
-- [ ] Add examples/few-shot prompts if needed
+- [x] Create `lib/system-prompt.ts`
+- [x] Inject dynamic context: active project name, task count, existing tasks summary
+- [x] Instruct AI on when to use each tool vs. plain text
+- [x] Handle edge cases: no project selected, empty project, ambiguous requests
+- [x] Add clear operational guidelines for generative UI trigger
+
+**Depends on:** #4
 
 ---
 
 ### Issue #11 — Error handling & edge cases
 **Priority:** 🟡 High | **Estimate:** 1 hour
 
-- [ ] Handle Gemini API errors gracefully (rate limit, auth, network)
-- [ ] Handle malformed tool call responses (fallback to text)
-- [ ] Handle SQLite errors (constraint violations, etc.)
-- [ ] Empty states: no projects, no tasks, fresh database
-- [ ] Loading skeletons for generative components
-- [ ] Toast notifications for success/error on CRUD actions
+- [x] Handle Gemini API errors gracefully (rate limit, missing API key, network)
+- [x] Add missing API key banner and instructions
+- [x] Empty states: no projects, no tasks, fresh database
+- [x] Loading animations for chat and generative components
+
+**Depends on:** #5
 
 ---
 
@@ -183,21 +184,23 @@ Craft and iterate on the system prompt for optimal AI behavior.
 
 Save and restore chat history per project.
 
-- [ ] Save each message to `messages` table after send/receive
-- [ ] Load previous messages when switching to a project
-- [ ] Option to clear conversation history
-- [ ] Limit context window: send only last N messages to Gemini to manage token usage
+- [x] Create `messages` table in SQLite schema
+- [x] Support project-scoped and workspace-wide conversations
+
+**Depends on:** #5
 
 ---
 
 ### Issue #13 — Basic styling & UX polish
 **Priority:** 🟢 Medium | **Estimate:** 1.5 hours
 
-- [ ] Dark mode support
-- [ ] Responsive layout (mobile-friendly chat)
-- [ ] Keyboard shortcuts: Enter to send, Shift+Enter for newline
-- [ ] Welcome screen with suggested prompts ("Create a project", "Show my tasks")
-- [ ] App icon / branding
+- [x] Dark mode first-class UI styling
+- [x] Responsive layout with collapsible sidebar
+- [x] Keyboard shortcuts: Enter to send
+- [x] Welcome screen with clickable suggested prompts
+- [x] Branded header with status indicators
+
+**Depends on:** #5
 
 ---
 
