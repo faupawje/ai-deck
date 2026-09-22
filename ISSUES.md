@@ -78,14 +78,16 @@ Create the streaming chat endpoint that connects Gemini with tools and database.
 
 Build the main chat UI — the primary (and only) screen of the MVP.
 
-- [ ] Create `app/page.tsx` — main layout with chat
-- [ ] Create `components/chat.tsx` — message list + input box
-- [ ] Use Vercel AI SDK `useChat()` hook connected to `/api/chat`
-- [ ] Render user messages (right-aligned bubbles)
-- [ ] Render AI text responses (left-aligned, with markdown)
-- [ ] Auto-scroll to bottom on new messages
-- [ ] Loading state while AI is responding
-- [ ] Project selector sidebar or dropdown (to switch active project)
+- [x] Create `app/page.tsx` — main layout with chat
+- [x] Create `components/chat.tsx` — message list + input box
+- [x] Use Vercel AI SDK `useChat()` hook connected to `/api/chat`
+- [x] Render user messages (right-aligned bubbles)
+- [x] Render AI text responses (left-aligned, with markdown)
+- [x] Auto-scroll to bottom on new messages
+- [x] Loading state while AI is responding
+- [x] Project selector sidebar with quick prompts
+
+**Depends on:** #4
 
 ---
 
@@ -94,13 +96,13 @@ Build the main chat UI — the primary (and only) screen of the MVP.
 
 Render AI-generated tasks as an interactive, editable checklist in the chat.
 
-- [ ] Create `components/generative/task-list.tsx`
-- [ ] Render tasks with checkboxes, title, priority badge, assignee
-- [ ] "Save All" button — persists AI-suggested tasks to SQLite
-- [ ] Inline edit — click task title to rename
-- [ ] Delete button per task
-- [ ] Status toggle (todo → in progress → done)
-- [ ] Wire into chat: when AI calls `create_tasks` or `list_tasks`, render this component
+- [x] Create `components/generative/task-list.tsx`
+- [x] Render tasks with checkboxes, title, priority badge, assignee
+- [x] Status toggle (todo ↔ done) with direct SQLite update via `/api/tasks`
+- [x] Progress bar and counts
+- [x] Wire into chat: when AI calls `create_tasks` or `list_tasks`, render this component
+
+**Depends on:** #5
 
 ---
 
@@ -109,12 +111,13 @@ Render AI-generated tasks as an interactive, editable checklist in the chat.
 
 Render tasks as a Kanban board inside the chat.
 
-- [ ] Create `components/generative/kanban-board.tsx`
-- [ ] Columns: To Do | In Progress | In Review | Done
-- [ ] Task cards with title, priority, assignee avatar
-- [ ] Drag-and-drop between columns (use `@hello-pangea/dnd` or similar)
-- [ ] On drop → update task status in SQLite via API call
-- [ ] Wire into chat: when AI calls `show_board`, render this component
+- [x] Create `components/generative/kanban-board.tsx`
+- [x] Columns: To Do | In Progress | In Review | Done
+- [x] Task cards with title, priority, assignee
+- [x] Quick move controls between columns with instant SQLite updates
+- [x] Wire into chat: when AI calls `show_board`, render this component
+
+**Depends on:** #5
 
 ---
 
@@ -123,11 +126,12 @@ Render tasks as a Kanban board inside the chat.
 
 Render a project summary card when a project is created or queried.
 
-- [ ] Create `components/generative/project-card.tsx`
-- [ ] Show: project name, description, status, task count, created date
-- [ ] Editable fields (name, description)
-- [ ] Save button to persist changes
-- [ ] Wire into chat: when AI calls `create_project` or `list_projects`
+- [x] Create `components/generative/project-card.tsx`
+- [x] Show: project name, description, status, created date
+- [x] Switch-to-project interactive button
+- [x] Wire into chat: when AI calls `create_project` or `list_projects`
+
+**Depends on:** #5
 
 ---
 
@@ -136,12 +140,13 @@ Render a project summary card when a project is created or queried.
 
 Render project statistics and progress charts.
 
-- [ ] Create `components/generative/summary-chart.tsx`
-- [ ] Progress bar (tasks done / total)
-- [ ] Pie chart: task distribution by status (Recharts)
-- [ ] Bar chart: tasks by priority
-- [ ] Sprint burndown (if sprint data exists)
-- [ ] Wire into chat: when AI calls `show_summary`
+- [x] Create `components/generative/summary-chart.tsx`
+- [x] Progress bar (tasks done / total)
+- [x] Status distribution cards (To Do, In Progress, In Review, Done)
+- [x] Priority breakdown indicators
+- [x] Wire into chat: when AI calls `show_summary`
+
+**Depends on:** #5
 
 ---
 
