@@ -4,7 +4,7 @@ import * as db from "./db";
 
 export const createProjectTool = tool({
   description: "Create a new project with a name and optional description.",
-  parameters: z.object({
+  inputSchema: z.object({
     name: z.string().describe("The name of the project"),
     description: z.string().optional().describe("A brief description of the project goals"),
   }),
@@ -20,7 +20,7 @@ export const createProjectTool = tool({
 
 export const listProjectsTool = tool({
   description: "List all existing projects.",
-  parameters: z.object({}),
+  inputSchema: z.object({}),
   execute: async () => {
     const projects = db.getAllProjects();
     return {
@@ -32,7 +32,7 @@ export const listProjectsTool = tool({
 
 export const createTasksTool = tool({
   description: "Create one or more tasks for a specific project. Use this when breaking down requirements or generating a task list.",
-  parameters: z.object({
+  inputSchema: z.object({
     projectId: z.string().describe("The ID of the project to add tasks to"),
     tasks: z.array(
       z.object({
@@ -80,7 +80,7 @@ export const createTasksTool = tool({
 
 export const listTasksTool = tool({
   description: "List tasks for a project, optionally filtering by status or sprint.",
-  parameters: z.object({
+  inputSchema: z.object({
     projectId: z.string().describe("The ID of the project"),
     status: z.enum(["todo", "in_progress", "in_review", "done"]).optional().describe("Filter by task status"),
     sprint: z.string().optional().describe("Filter by sprint"),
@@ -104,7 +104,7 @@ export const listTasksTool = tool({
 
 export const updateTaskTool = tool({
   description: "Update task properties like status, priority, title, assignee, or sprint.",
-  parameters: z.object({
+  inputSchema: z.object({
     taskId: z.string().describe("The ID of the task to update"),
     status: z.enum(["todo", "in_progress", "in_review", "done"]).optional().describe("New status"),
     priority: z.enum(["low", "medium", "high", "urgent"]).optional().describe("New priority"),
@@ -128,7 +128,7 @@ export const updateTaskTool = tool({
 
 export const deleteTaskTool = tool({
   description: "Delete a task by ID.",
-  parameters: z.object({
+  inputSchema: z.object({
     taskId: z.string().describe("The ID of the task to delete"),
   }),
   execute: async ({ taskId }) => {
@@ -142,7 +142,7 @@ export const deleteTaskTool = tool({
 
 export const showBoardTool = tool({
   description: "Display an interactive Kanban board grouped by status (todo, in_progress, in_review, done) for a project.",
-  parameters: z.object({
+  inputSchema: z.object({
     projectId: z.string().describe("The ID of the project to view as a board"),
   }),
   execute: async ({ projectId }) => {
@@ -171,7 +171,7 @@ export const showBoardTool = tool({
 
 export const showSummaryTool = tool({
   description: "Display project progress statistics, completion percentages, and priority breakdowns.",
-  parameters: z.object({
+  inputSchema: z.object({
     projectId: z.string().describe("The ID of the project to summarize"),
   }),
   execute: async ({ projectId }) => {

@@ -60,15 +60,16 @@ Define the tools (function declarations) that Gemini can call to interact with p
 
 Create the streaming chat endpoint that connects Gemini with tools and database.
 
-- [ ] Create `app/api/chat/route.ts`
-- [ ] Use Vercel AI SDK `streamText()` with `google()` provider
-- [ ] Attach tools from `lib/tools.ts`
-- [ ] Build system prompt with project context (current project, task counts, etc.)
-- [ ] Handle `maxSteps` for multi-turn tool calling (AI calls tool → gets result → responds)
-- [ ] Return streaming response
-- [ ] Test with curl or simple fetch
+- [x] Create `app/api/chat/route.ts`
+- [x] Use Vercel AI SDK `streamText()` with `google()` provider
+- [x] Attach tools from `lib/tools.ts`
+- [x] Build system prompt with project context (`lib/system-prompt.ts`)
+- [x] Handle `stopWhen: isStepCount(5)` for multi-turn tool calling (AI calls tool → gets result → responds)
+- [x] Return streaming UI response via `createUIMessageStreamResponse`
+- [x] Create companion API routes `/api/projects` and `/api/tasks` for frontend data access
+- [x] Verify production build passes
 
----
+**Depends on:** #3
 
 ## Milestone 3: Chat UI
 
