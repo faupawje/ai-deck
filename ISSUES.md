@@ -25,15 +25,15 @@ Set up the Next.js project with all dependencies.
 
 Create the database schema and query helpers.
 
-- [ ] Create `lib/db.ts` — SQLite connection + auto-create tables
-- [ ] Schema: `projects` table (id, name, description, status, created_at, updated_at)
-- [ ] Schema: `tasks` table (id, project_id, title, description, status, priority, sprint, assignee, sort_order, created_at, updated_at)
-- [ ] Schema: `messages` table (id, project_id, role, content, tool_calls_json, created_at)
-- [ ] Write CRUD helpers: `createProject()`, `getTasks()`, `createTask()`, `updateTask()`, etc.
-- [ ] Write a seed script for test data (optional)
-- [ ] Verify: import db in a test route, confirm tables are created
+- [x] Create `lib/db.ts` — SQLite connection + auto-create tables
+- [x] Schema: `projects` table (id, name, description, status, created_at, updated_at)
+- [x] Schema: `tasks` table (id, project_id, title, description, status, priority, sprint, assignee, sort_order, created_at, updated_at)
+- [x] Schema: `messages` table (id, project_id, role, content, tool_calls_json, created_at)
+- [x] Write CRUD helpers: `createProject()`, `getTasks()`, `createTask()`, `updateTask()`, etc.
+- [x] Write a seed / verification test
+- [x] Verify: tables created, transactions & indexes functional
 
----
+**Depends on:** #1
 
 ## Milestone 2: AI Chat Core
 
