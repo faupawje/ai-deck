@@ -22,209 +22,230 @@ async function handleSeed(req: Request) {
       db.prepare("DELETE FROM projects").run();
     }
 
-    // 1. CyberNexus: Flagship AI Game Engine
-    const cyberId = "proj_cybernexus_engine";
-    let cyberProject = db.prepare("SELECT * FROM projects WHERE id = ?").get(cyberId);
-    if (!cyberProject) {
+    // 1. Primary Flagship: AI-Deck Itself!
+    const aideckId = "proj_aideck_platform";
+    let aideckProject = db.prepare("SELECT * FROM projects WHERE id = ?").get(aideckId);
+    if (!aideckProject) {
       db.prepare(`
         INSERT INTO projects (id, name, description, status, created_at, updated_at)
         VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       `).run(
-        cyberId,
-        "CyberNexus: AI Game Engine",
-        "Real-time neural physics & WebGPU rendering engine with autonomous NPC intelligence and distributed spatial computing.",
+        aideckId,
+        "AI-Deck: AI Project Management Platform",
+        "Autonomous project secretary with generative UI cards and animated pixel-art familiars backed by Gemini 3.6 Flash and SQLite.",
         "active"
       );
     }
 
-    // 2. NeoPay: Mobile Fintech Wallet
-    const neopayId = "proj_neopay_wallet";
-    let neopayProject = db.prepare("SELECT * FROM projects WHERE id = ?").get(neopayId);
-    if (!neopayProject) {
+    // 2. Accio-Style Workflow Automation (Secondary Active)
+    const accioId = "proj_workflow_automation";
+    let accioProject = db.prepare("SELECT * FROM projects WHERE id = ?").get(accioId);
+    if (!accioProject) {
       db.prepare(`
         INSERT INTO projects (id, name, description, status, created_at, updated_at)
         VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       `).run(
-        neopayId,
-        "NeoPay: Web3 & Fiat Wallet",
-        "Biometric tap-to-pay multi-currency wallet with instant cross-border settlement and automated escrow contracts.",
+        accioId,
+        "Workflow Automation & Slack Dispatcher",
+        "Autonomous triggers that export daily standup summaries and blocker audits to company Slack channels.",
         "active"
       );
     }
 
-    // 3. Quantum: Design System (Completed)
-    const quantumId = "proj_quantum_design";
-    let quantumProject = db.prepare("SELECT * FROM projects WHERE id = ?").get(quantumId);
-    if (!quantumProject) {
+    // 3. Vercel AI SDK v7 Upgrade (Completed Milestone)
+    const sdkUpgradeId = "proj_sdk_upgrade";
+    let sdkProject = db.prepare("SELECT * FROM projects WHERE id = ?").get(sdkUpgradeId);
+    if (!sdkProject) {
       db.prepare(`
         INSERT INTO projects (id, name, description, status, created_at, updated_at)
         VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       `).run(
-        quantumId,
-        "Quantum: Retro Pixel Design System",
-        "Unified design tokens, Tailwind CSS component library, WCAG AAA accessibility, and pixel-art sprite kit.",
+        sdkUpgradeId,
+        "Vercel AI SDK v7 Migration",
+        "Migrated tool schema from jsonSchema/parameters to inputSchema and upgraded streaming primitives.",
         "completed"
       );
     }
 
-    // 4. Sentinel: Drone Swarm Dispatcher (Paused)
-    const sentinelId = "proj_sentinel_swarm";
-    let sentinelProject = db.prepare("SELECT * FROM projects WHERE id = ?").get(sentinelId);
-    if (!sentinelProject) {
-      db.prepare(`
-        INSERT INTO projects (id, name, description, status, created_at, updated_at)
-        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-      `).run(
-        sentinelId,
-        "Sentinel: Drone Swarm Fleet",
-        "Mesh network protocols for autonomous multi-drone formation flight and real-time obstacle evasion.",
-        "paused"
-      );
-    }
-
-    // Seed Tasks for CyberNexus if not present
-    const existingCyberTasks = getTasks(cyberId);
-    if (existingCyberTasks.length === 0) {
-      const demoCyberTasks = [
-        // Done (Sprint 1)
+    // Tasks for AI-Deck Platform
+    const existingAiDeckTasks = getTasks(aideckId);
+    if (existingAiDeckTasks.length === 0) {
+      const realTasks = [
+        // Sprint 1: Foundation (Done)
         {
-          id: "task_cn_01",
-          project_id: cyberId,
-          title: "Implement WebGPU compute shader pipeline",
-          description: "Construct zero-copy compute buffers for matrix math on Metal, DirectX 12, and Vulkan backends.",
+          id: "task_01",
+          project_id: aideckId,
+          title: "#1 Scaffolding Next.js 16 + Tailwind CSS v4",
+          description: "Initialize Turbopack, React 19, Lucide icons, and Tailwind v4 configuration.",
           status: "done" as const,
           priority: "high" as const,
-          sprint: "Sprint 1",
-          assignee: "Marcus Chen",
+          sprint: "Sprint 1 - Foundation",
+          assignee: "faupawje",
           sort_order: 1,
         },
         {
-          id: "task_cn_02",
-          project_id: cyberId,
-          title: "SQLite local asset cache & metadata store",
-          description: "Store compiled SPIR-V shaders and textures in an embedded database for instant hot-reload.",
+          id: "task_02",
+          project_id: aideckId,
+          title: "#2 SQLite database layer (better-sqlite3)",
+          description: "Setup projects, tasks, and messages tables with WAL journal mode and foreign keys.",
           status: "done" as const,
-          priority: "medium" as const,
-          sprint: "Sprint 1",
-          assignee: "Devin AI",
+          priority: "high" as const,
+          sprint: "Sprint 1 - Foundation",
+          assignee: "faupawje",
           sort_order: 2,
         },
         {
-          id: "task_cn_03",
-          project_id: cyberId,
-          title: "Neural NPC decision tree & behavior state machine",
-          description: "Lightweight runtime inference runner for autonomous NPC goal hierarchy and environmental awareness.",
+          id: "task_03",
+          project_id: aideckId,
+          title: "#3 Gemini tool definitions & schema",
+          description: "Define tools for create_project, create_tasks, update_task, delete_task, and show_board.",
           status: "done" as const,
           priority: "high" as const,
-          sprint: "Sprint 1",
-          assignee: "Elena Rostova",
+          sprint: "Sprint 1 - Foundation",
+          assignee: "faupawje",
           sort_order: 3,
         },
-        // In Review (Sprint 2)
         {
-          id: "task_cn_04",
-          project_id: cyberId,
-          title: "Zero-copy memory ring buffer for spatial physics",
-          description: "High-frequency lock-free ring buffer feeding rigid body collision data into compute shader. Needs memory safety audit.",
-          status: "in_review" as const,
-          priority: "urgent" as const,
-          sprint: "Sprint 2",
-          assignee: "Marcus Chen",
+          id: "task_04",
+          project_id: aideckId,
+          title: "#4 Next.js chat streaming API route",
+          description: "Setup streamText with Gemini 3.6 Flash and createUIMessageStreamResponse.",
+          status: "done" as const,
+          priority: "high" as const,
+          sprint: "Sprint 1 - Foundation",
+          assignee: "faupawje",
           sort_order: 4,
         },
+
+        // Sprint 2: Generative UI & Familiars (Done)
         {
-          id: "task_cn_05",
-          project_id: cyberId,
-          title: "SPIR-V to WGSL offline cross-compilation tool",
-          description: "Pre-compile GLSL/HLSL shaders into WebGPU WGSL at build time with source-map debugging support.",
-          status: "in_review" as const,
-          priority: "medium" as const,
-          sprint: "Sprint 2",
-          assignee: "Elena Rostova",
+          id: "task_07",
+          project_id: aideckId,
+          title: "#7 Interactive Kanban board generative UI",
+          description: "4-column agile board component with real-time status change buttons connected to SQLite.",
+          status: "done" as const,
+          priority: "high" as const,
+          sprint: "Sprint 2 - Generative UI",
+          assignee: "faupawje",
           sort_order: 5,
         },
-        // In Progress (Sprint 2)
         {
-          id: "task_cn_06",
-          project_id: cyberId,
-          title: "Autonomous NPC conversational perception layer",
-          description: "Hook Gemini 3.6 Flash streaming response into dynamic game subtitle and spatial lip-sync audio generator.",
-          status: "in_progress" as const,
-          priority: "urgent" as const,
-          sprint: "Sprint 2",
-          assignee: "Elena Rostova",
+          id: "task_06",
+          project_id: aideckId,
+          title: "#6 Task list generative UI with interactive checkboxes",
+          description: "Compact checklist component with instant SQLite status toggle for agile sprint tracking.",
+          status: "done" as const,
+          priority: "medium" as const,
+          sprint: "Sprint 2 - Generative UI",
+          assignee: "faupawje",
           sort_order: 6,
         },
         {
-          id: "task_cn_07",
-          project_id: cyberId,
-          title: "Real-time ray-traced ambient occlusion shaders",
-          description: "Screen-space temporal reprojection with adaptive denoising filters running at 120 FPS on 4K displays.",
-          status: "in_progress" as const,
+          id: "task_17",
+          project_id: aideckId,
+          title: "#17 Animated pixel sprite system (Ember & Specter)",
+          description: "Pixel-art fantasy familiars in pure SVG with idle, thinking, celebrating, and alert animations.",
+          status: "done" as const,
           priority: "high" as const,
-          sprint: "Sprint 2",
-          assignee: "Marcus Chen",
+          sprint: "Sprint 2 - Generative UI",
+          assignee: "faupawje",
           sort_order: 7,
         },
         {
-          id: "task_cn_08",
-          project_id: cyberId,
-          title: "Bi-directional WebSocket synchronization for physics",
-          description: "Client-side prediction and server reconciliation for multi-player collision events at 60 Hz tickrate.",
-          status: "in_progress" as const,
-          priority: "medium" as const,
-          sprint: "Sprint 2",
-          assignee: "Kai Tanaka",
+          id: "task_18",
+          project_id: aideckId,
+          title: "#18 Project Secretary agent companion tools",
+          description: "Autonomous secretary_briefing, audit_risks, and ingest_notes tools with Ember persona.",
+          status: "done" as const,
+          priority: "high" as const,
+          sprint: "Sprint 2 - Generative UI",
+          assignee: "faupawje",
           sort_order: 8,
         },
-        // Todo (Sprint 2 & 3)
         {
-          id: "task_cn_09",
-          project_id: cyberId,
-          title: "Critical memory leak in particle compute emitter",
-          description: "Unbounded VRAM allocation when particle count exceeds 500,000 instances during prolonged emitter run.",
-          status: "todo" as const,
-          priority: "urgent" as const,
-          sprint: "Sprint 2",
-          assignee: "Unassigned", // Triggers risk audit!
+          id: "task_19",
+          project_id: aideckId,
+          title: "#19 Secretary daily standup briefing UI card",
+          description: "Generative briefing card rendering focus tasks, recent sprint wins, bottlenecks, and tips.",
+          status: "done" as const,
+          priority: "high" as const,
+          sprint: "Sprint 2 - Generative UI",
+          assignee: "faupawje",
           sort_order: 9,
         },
+
+        // Sprint 3: Polish & Persona (In Review / In Progress)
         {
-          id: "task_cn_10",
-          project_id: cyberId,
-          title: "Spatial audio occlusion calculation with BVH trees",
-          description: "Trace sound rays against bounding volume hierarchies to simulate realistic acoustic reverberation in enclosed rooms.",
-          status: "todo" as const,
+          id: "task_10",
+          project_id: aideckId,
+          title: "#10 System prompt engineering & Ember persona tuning",
+          description: "Guide Gemini to proactively render interactive UI cards instead of walls of plain text.",
+          status: "in_review" as const,
           priority: "high" as const,
-          sprint: "Sprint 3",
-          assignee: "Unassigned", // Triggers risk audit!
+          sprint: "Sprint 3 - Polish",
+          assignee: "faupawje",
           sort_order: 10,
         },
         {
-          id: "task_cn_11",
-          project_id: cyberId,
-          title: "Automated regression benchmark suite on GitHub Actions",
-          description: "Run headless rendering benchmarks on Linux GPU runners to prevent frame-time regressions over 16.6ms.",
-          status: "todo" as const,
+          id: "task_11",
+          project_id: aideckId,
+          title: "#11 Error handling & Gemini model deprecation fallback",
+          description: "Migrated from deprecated gemini-2.5/2.0-flash to verified gemini-3.6-flash API endpoint.",
+          status: "in_review" as const,
           priority: "medium" as const,
-          sprint: "Sprint 3",
-          assignee: "Sarah Connor",
+          sprint: "Sprint 3 - Polish",
+          assignee: "faupawje",
           sort_order: 11,
         },
         {
-          id: "task_cn_12",
-          project_id: cyberId,
-          title: "Developer documentation for C++ & Rust plugin bindings",
-          description: "Comprehensive guide with code examples illustrating how to register custom C ABI native extensions.",
-          status: "todo" as const,
-          priority: "low" as const,
-          sprint: "Sprint 3",
-          assignee: "Sarah Connor",
+          id: "task_13",
+          project_id: aideckId,
+          title: "#13 Onboarding mental model & showcase cards",
+          description: "Explain how users collaborate with Ember and clarify the chat-driven workspace paradigm.",
+          status: "in_progress" as const,
+          priority: "urgent" as const,
+          sprint: "Sprint 3 - Polish",
+          assignee: "faupawje",
           sort_order: 12,
+        },
+
+        // Sprint 4: Future Roadmap (Todo - intentional risks for Specter audit!)
+        {
+          id: "task_14",
+          project_id: aideckId,
+          title: "#14 Multi-user auth & workspace permissions",
+          description: "Role-based access control (Admin, Member, Viewer) with session management and user isolation.",
+          status: "todo" as const,
+          priority: "urgent" as const,
+          sprint: "Sprint 4 - Roadmap",
+          assignee: "Unassigned", // Triggers risk auditor!
+          sort_order: 13,
+        },
+        {
+          id: "task_15",
+          project_id: aideckId,
+          title: "#15 Migrate SQLite to PostgreSQL with Drizzle ORM",
+          description: "Production database migration strategy for high-concurrency cloud deployments on Supabase/Neon.",
+          status: "todo" as const,
+          priority: "high" as const,
+          sprint: "Sprint 4 - Roadmap",
+          assignee: "Unassigned", // Triggers risk auditor!
+          sort_order: 14,
+        },
+        {
+          id: "task_16",
+          project_id: aideckId,
+          title: "#16 Advanced autonomous agent delegation & webhook exports",
+          description: "Multi-agent coordination between Specter (QA auditor) and Ember (Secretary) with Slack webhooks.",
+          status: "todo" as const,
+          priority: "medium" as const,
+          sprint: "Sprint 4 - Roadmap",
+          assignee: "faupawje",
+          sort_order: 15,
         },
       ];
 
-      for (const t of demoCyberTasks) {
+      for (const t of realTasks) {
         db.prepare(`
           INSERT INTO tasks (id, project_id, title, description, status, priority, sprint, assignee, sort_order, created_at, updated_at)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
@@ -232,57 +253,46 @@ async function handleSeed(req: Request) {
       }
     }
 
-    // Seed Tasks for NeoPay
-    const existingNeoTasks = getTasks(neopayId);
-    if (existingNeoTasks.length === 0) {
-      const demoNeoTasks = [
+    // Tasks for Accio Workflow project
+    const existingAccioTasks = getTasks(accioId);
+    if (existingAccioTasks.length === 0) {
+      const accioTasks = [
         {
-          id: "task_neo_01",
-          project_id: neopayId,
-          title: "Pass PCI-DSS Level 1 compliance pre-audit",
-          description: "Verify end-to-end tokenization and HSM hardware key isolation with third-party auditor.",
+          id: "task_ac_01",
+          project_id: accioId,
+          title: "Setup Slack Incoming Webhook configuration",
+          description: "Allow users to paste a webhook URL for automated 9:00 AM daily standup broadcasts.",
           status: "done" as const,
-          priority: "urgent" as const,
+          priority: "high" as const,
           sprint: "Sprint 1",
-          assignee: "Sarah Connor",
+          assignee: "faupawje",
           sort_order: 1,
         },
         {
-          id: "task_neo_02",
-          project_id: neopayId,
-          title: "Apple Pay & Google Pay PassKit integration",
-          description: "Provision virtual card tokens directly into native Apple Wallet and Google Wallet securely.",
+          id: "task_ac_02",
+          project_id: accioId,
+          title: "Format generative briefing cards into Slack Block Kit",
+          description: "Convert Ember standup data into rich interactive Slack message payloads with buttons.",
           status: "in_progress" as const,
           priority: "urgent" as const,
           sprint: "Sprint 1",
-          assignee: "Marcus Chen",
+          assignee: "faupawje",
           sort_order: 2,
         },
         {
-          id: "task_neo_03",
-          project_id: neopayId,
-          title: "Automate chargeback dispute resolution workflow",
-          description: "Trigger automated evidentiary document compilation when a dispute webhook arrives from Stripe/Adyen.",
-          status: "todo" as const,
-          priority: "high" as const,
-          sprint: "Sprint 2",
-          assignee: "Kai Tanaka",
-          sort_order: 3,
-        },
-        {
-          id: "task_neo_04",
-          project_id: neopayId,
-          title: "Biometric WebAuthn passkey registration",
-          description: "Replace legacy SMS OTP 2FA with FIDO2 hardware passkeys synced across iCloud Keychain and Chrome.",
+          id: "task_ac_03",
+          project_id: accioId,
+          title: "Automate cron trigger for standup generation",
+          description: "Trigger secretary_briefing tool automatically on weekdays without manual prompt.",
           status: "todo" as const,
           priority: "medium" as const,
-          assignee: "Unassigned",
           sprint: "Sprint 2",
-          sort_order: 4,
+          assignee: "Unassigned",
+          sort_order: 3,
         },
       ];
 
-      for (const t of demoNeoTasks) {
+      for (const t of accioTasks) {
         db.prepare(`
           INSERT INTO tasks (id, project_id, title, description, status, priority, sprint, assignee, sort_order, created_at, updated_at)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
@@ -290,132 +300,46 @@ async function handleSeed(req: Request) {
       }
     }
 
-    // Seed Tasks for Quantum Design
-    const existingQuantumTasks = getTasks(quantumId);
-    if (existingQuantumTasks.length === 0) {
-      const demoQuantumTasks = [
+    // Tasks for SDK Upgrade
+    const existingSdkTasks = getTasks(sdkUpgradeId);
+    if (existingSdkTasks.length === 0) {
+      const sdkTasks = [
         {
-          id: "task_qd_01",
-          project_id: quantumId,
-          title: "Design retro pixel sprite sheets (Ember & Specter)",
-          description: "Pixel-perfect SVG illustrations with responsive frame animations for idle, thinking, and celebratory states.",
+          id: "task_sdk_01",
+          project_id: sdkUpgradeId,
+          title: "Migrate parameters to inputSchema in lib/tools.ts",
+          description: "Conform to Vercel AI SDK v7 Zod schema expectations for tool declarations.",
           status: "done" as const,
           priority: "high" as const,
           sprint: "Sprint 1",
-          assignee: "Kai Tanaka",
+          assignee: "faupawje",
           sort_order: 1,
         },
         {
-          id: "task_qd_02",
-          project_id: quantumId,
-          title: "WCAG 2.2 AAA accessibility & contrast audit",
-          description: "Guarantee all text and interactive indicators exceed 7:1 color contrast ratios across dark mode surfaces.",
+          id: "task_sdk_02",
+          project_id: sdkUpgradeId,
+          title: "Implement toUIMessageStream & createUIMessageStreamResponse",
+          description: "Update /api/chat route to stream UI-compatible chunks for React 19.",
           status: "done" as const,
-          priority: "medium" as const,
+          priority: "high" as const,
           sprint: "Sprint 1",
-          assignee: "Sarah Connor",
+          assignee: "faupawje",
           sort_order: 2,
-        },
-        {
-          id: "task_qd_03",
-          project_id: quantumId,
-          title: "Publish npm component package v1.0.0",
-          description: "Export TypeScript definitions, ESM bundles, and Tailwind CSS preset configuration.",
-          status: "done" as const,
-          priority: "low" as const,
-          sprint: "Sprint 1",
-          assignee: "Devin AI",
-          sort_order: 3,
         },
       ];
 
-      for (const t of demoQuantumTasks) {
+      for (const t of sdkTasks) {
         db.prepare(`
           INSERT INTO tasks (id, project_id, title, description, status, priority, sprint, assignee, sort_order, created_at, updated_at)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         `).run(t.id, t.project_id, t.title, t.description, t.status, t.priority, t.sprint, t.assignee, t.sort_order);
       }
-    }
-
-    // Seed Sample Messages for CyberNexus showcasing Ember Secretary
-    const existingMessages = db.prepare("SELECT count(*) as count FROM messages WHERE project_id = ?").get(cyberId) as { count: number };
-    if (existingMessages.count === 0) {
-      db.prepare(`
-        INSERT INTO messages (id, project_id, role, content, tool_calls_json, created_at)
-        VALUES (?, ?, ?, ?, ?, datetime('now', '-30 minutes'))
-      `).run(
-        "msg_demo_01",
-        cyberId,
-        "user",
-        "Ember, prepare today's daily standup briefing for CyberNexus: AI Game Engine",
-        null
-      );
-
-      const standupBriefingPayload = {
-        name: "secretary_briefing",
-        result: {
-          project: {
-            id: cyberId,
-            name: "CyberNexus: AI Game Engine",
-            totalTasks: 12,
-            completionPercentage: 25,
-          },
-          date: new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric", year: "numeric" }),
-          focusTasks: [
-            {
-              id: "task_cn_06",
-              title: "Autonomous NPC conversational perception layer",
-              priority: "urgent",
-              assignee: "Elena Rostova",
-              sprint: "Sprint 2",
-              status: "in_progress",
-            },
-            {
-              id: "task_cn_04",
-              title: "Zero-copy memory ring buffer for spatial physics",
-              priority: "urgent",
-              assignee: "Marcus Chen",
-              sprint: "Sprint 2",
-              status: "in_review",
-            },
-            {
-              id: "task_cn_07",
-              title: "Real-time ray-traced ambient occlusion shaders",
-              priority: "high",
-              assignee: "Marcus Chen",
-              sprint: "Sprint 2",
-              status: "in_progress",
-            },
-          ],
-          bottlenecks: [
-            "Critical memory leak in particle compute emitter is marked URGENT but has no assignee.",
-            "Zero-copy memory ring buffer has been in review; unblocking this is required for the physics stress test.",
-          ],
-          recentWins: [
-            "WebGPU compute shader pipeline successfully verified on Apple Silicon & Vulkan.",
-            "Neural NPC decision tree inference engine running at sub-millisecond latency.",
-            "Embedded SQLite asset cache hot-reload operational.",
-          ],
-          secretaryTip: "🔥 Pro tip: Assign Marcus Chen or Devin AI to the particle emitter memory leak before it compounds during multiplayer stress tests.",
-        },
-      };
-
-      db.prepare(`
-        INSERT INTO messages (id, project_id, role, content, tool_calls_json, created_at)
-        VALUES (?, ?, ?, ?, ?, datetime('now', '-29 minutes'))
-      `).run(
-        "msg_demo_02",
-        cyberId,
-        "assistant",
-        "🔥 **Good morning!** I have compiled the Daily Standup Briefing for **CyberNexus: AI Game Engine**.\n\nOur momentum is strong with 3 major engine milestones landed, but we have an urgent memory leak in the particle emitter that needs an owner today!",
-        JSON.stringify([standupBriefingPayload])
-      );
     }
 
     const allProjects = getAllProjects();
     return NextResponse.json({
       success: true,
-      message: "Database seeded successfully with rich demo data across all features.",
+      message: "Database seeded successfully with AI-Deck's own real development milestones and issues.",
       projectsCount: allProjects.length,
       projects: allProjects,
     });

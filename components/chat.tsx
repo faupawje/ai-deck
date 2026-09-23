@@ -364,24 +364,69 @@ export function Chat({ initialProjects = [] }: { initialProjects?: Project[] }) 
         {/* Message Stream */}
         <div className="flex-1 overflow-y-auto px-4 md:px-8 py-6 space-y-6">
           {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center max-w-md mx-auto py-12">
-              <div className="mb-4">
+            <div className="flex flex-col items-center justify-center min-h-[80%] text-center max-w-xl mx-auto py-8">
+              <div className="mb-3">
                 <PixelSprite archetype="ember" state="idle" size="xl" />
               </div>
-              <h3 className="text-base font-bold text-zinc-100 mb-1">
+              <h3 className="text-lg font-bold text-zinc-100 mb-1">
                 Meet Ember, Your Project Secretary
               </h3>
-              <p className="text-xs text-zinc-400 mb-6 leading-relaxed">
-                An autonomous familiar who keeps project momentum blazing. Run standups,
-                ingest messy meeting notes into tasks, and audit bottlenecks.
+              <p className="text-xs text-zinc-400 mb-4 max-w-md leading-relaxed">
+                An autonomous familiar who keeps project momentum blazing. You manage high-level vision; Ember handles standups, organizes meeting notes into tasks, and audits bottlenecks.
               </p>
 
+              {/* Mental Model 3-Step Guide */}
+              <div className="grid grid-cols-3 gap-2 w-full mb-6 text-left">
+                <div className="p-2.5 rounded-lg border border-zinc-800/80 bg-zinc-900/40">
+                  <div className="text-[11px] font-semibold text-amber-300 flex items-center gap-1 mb-1">
+                    <span>1.</span>
+                    <span>Chat or Trigger</span>
+                  </div>
+                  <p className="text-[10px] text-zinc-400 leading-normal">
+                    Talk in natural language or click quick actions. No manual ticket forms.
+                  </p>
+                </div>
+
+                <div className="p-2.5 rounded-lg border border-zinc-800/80 bg-zinc-900/40">
+                  <div className="text-[11px] font-semibold text-purple-300 flex items-center gap-1 mb-1">
+                    <span>2.</span>
+                    <span>Living UI Cards</span>
+                  </div>
+                  <p className="text-[10px] text-zinc-400 leading-normal">
+                    Ember renders interactive Kanban boards & standup cards inline.
+                  </p>
+                </div>
+
+                <div className="p-2.5 rounded-lg border border-zinc-800/80 bg-zinc-900/40">
+                  <div className="text-[11px] font-semibold text-emerald-300 flex items-center gap-1 mb-1">
+                    <span>3.</span>
+                    <span>Direct SQLite Sync</span>
+                  </div>
+                  <p className="text-[10px] text-zinc-400 leading-normal">
+                    Moving cards or toggling tasks updates your local database instantly.
+                  </p>
+                </div>
+              </div>
+
+              {/* Active Project Banner */}
+              {activeProject && (
+                <div className="w-full flex items-center justify-between px-3 py-1.5 mb-4 rounded-md bg-zinc-900/80 border border-zinc-800 text-[11px]">
+                  <span className="text-zinc-400 flex items-center gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                    <span>Loaded Project:</span>
+                    <strong className="text-zinc-200">{activeProject.name}</strong>
+                  </span>
+                  <span className="text-zinc-500 font-mono text-[10px]">Real Git Milestone Data</span>
+                </div>
+              )}
+
+              {/* Interactive Showcase Actions */}
               <div className="grid grid-cols-1 gap-2.5 w-full text-left">
                 {[
                   {
                     icon: "⚡",
                     title: "Run Daily Standup Briefing",
-                    desc: "Analyzes focus tasks, recent wins, and bottlenecks",
+                    desc: "Ember summarizes closed foundation issues, today's sprint focus, and review items",
                     prompt: activeProject
                       ? `Ember, prepare today's daily standup briefing for ${activeProject.name}`
                       : "Ember, prepare today's daily standup briefing",
@@ -389,7 +434,7 @@ export function Chat({ initialProjects = [] }: { initialProjects?: Project[] }) 
                   {
                     icon: "🛡️",
                     title: "Audit Risks & Bottlenecks",
-                    desc: "Specter scans for stale tasks, scope creep, and unassigned urgent items",
+                    desc: "Specter audits the roadmap for unassigned urgent items (e.g. multi-user auth)",
                     prompt: activeProject
                       ? `Perform a risk and bottleneck audit for ${activeProject.name}`
                       : "Audit project risks and bottlenecks",
@@ -397,7 +442,7 @@ export function Chat({ initialProjects = [] }: { initialProjects?: Project[] }) 
                   {
                     icon: "📋",
                     title: "Open Interactive Kanban Board",
-                    desc: "View 4-column agile board with real-time status updates",
+                    desc: "Live 4-column agile board showing Sprints 1–4 with 1-click status moves",
                     prompt: activeProject
                       ? `Show me the Kanban board for ${activeProject.name}`
                       : "Show me the project board",
@@ -405,17 +450,17 @@ export function Chat({ initialProjects = [] }: { initialProjects?: Project[] }) 
                   {
                     icon: "📊",
                     title: "Project Metrics & Priority Stats",
-                    desc: "Visual progress percentage and sprint task breakdown",
+                    desc: "Visual charts for completion percentage and priority breakdown across tasks",
                     prompt: activeProject
                       ? `Show progress and metrics summary for ${activeProject.name}`
                       : "Summarize our project progress",
                   },
                   {
                     icon: "📥",
-                    title: "Ingest Unstructured Meeting Notes",
-                    desc: "Automatically extracts and categorizes tasks into SQLite",
+                    title: "Ingest Team Sync Notes into Tasks",
+                    desc: "Converts messy roadmap notes directly into structured SQLite tickets",
                     prompt: activeProject
-                      ? `Ingest these notes into tasks for ${activeProject.name}: 'Fix particle emitter VRAM memory leak, implement BVH audio occlusion, add headless CI rendering benchmark'`
+                      ? `Ingest these notes into tasks for ${activeProject.name}: 'Setup multi-user role permissions, implement PostgreSQL connection pool, add Slack incoming webhook notifications'`
                       : "Ingest these notes into tasks: 'Setup database schema, wire payment webhook, review auth flow'",
                   },
                 ].map((item, idx) => (
@@ -430,7 +475,7 @@ export function Chat({ initialProjects = [] }: { initialProjects?: Project[] }) 
                         <span>{item.icon}</span>
                         <span>{item.title}</span>
                       </span>
-                      <span className="text-[10px] text-zinc-500 group-hover:text-zinc-300">Run →</span>
+                      <span className="text-[10px] text-zinc-500 group-hover:text-zinc-300 font-mono">1-Click Run →</span>
                     </div>
                     <p className="text-[11px] text-zinc-400 leading-tight pl-5">
                       {item.desc}
