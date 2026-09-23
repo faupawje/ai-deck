@@ -307,7 +307,7 @@ export function Chat({ initialProjects = [] }: { initialProjects?: Project[] }) 
 
         {/* Footer info */}
         <div className="px-2 pt-3 pb-2 border-t border-zinc-800/80 text-[11px] text-zinc-500 flex items-center justify-between">
-          <span className="font-mono text-[10px]">Ember (Gemini 3.6)</span>
+          <span className="font-mono text-[10px]">Ember (Gemini 3.7)</span>
           <button
             type="button"
             onClick={fetchProjects}

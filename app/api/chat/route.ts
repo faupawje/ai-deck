@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     const { messages, projectId }: { messages: UIMessage[]; projectId?: string } = await req.json();
 
     const systemPrompt = buildSystemPrompt(projectId);
-    const modelName = process.env.GEMINI_MODEL || "gemini-3.6-flash";
+    const modelName = process.env.GEMINI_MODEL || "gemini-3.7-flash";
 
     const result = streamText({
       model: google(modelName),
@@ -43,7 +43,13 @@ export async function POST(req: Request) {
     });
 
     return createUIMessageStreamResponse({
-      stream: toUIMessageStream({ stream: result.stream }),
+      stream: toUIMessageStream({
+        stream: result.stream,
+        onError: (err) => {
+          console.error("STREAM ERROR CAUGHT IN toUIMessageStream:", err);
+          return err instanceof Error ? err.message : String(err);
+        },
+      }),
     });
   } catch (error: any) {
     console.error("Error in /api/chat:", error);
