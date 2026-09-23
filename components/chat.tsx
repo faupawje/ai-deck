@@ -20,7 +20,10 @@ import { TaskList } from "./generative/task-list";
 import { KanbanBoard } from "./generative/kanban-board";
 import { ProjectCard } from "./generative/project-card";
 import { SummaryChart } from "./generative/summary-chart";
+import { SecretaryBriefing } from "./generative/secretary-briefing";
+import { RiskReport } from "./generative/risk-report";
 import { MarkdownRenderer } from "./markdown-renderer";
+import { PixelSprite } from "./agents/pixel-sprite";
 
 export function Chat() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -115,17 +118,15 @@ export function Chat() {
         <div>
           {/* Brand Header */}
           <div className="flex items-center gap-2.5 px-2 py-2 mb-4">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-tr from-indigo-600 to-purple-500 shadow-md shadow-indigo-500/20">
-              <Sparkles className="h-4 w-4 text-white" />
-            </div>
+            <PixelSprite archetype="ember" state={isLoading ? "thinking" : "idle"} size="md" />
             <div>
               <h1 className="text-sm font-bold tracking-tight text-white flex items-center gap-1.5">
                 AI-Deck
-                <span className="rounded bg-indigo-500/20 px-1.5 py-0.2 text-[9px] font-semibold text-indigo-400 uppercase">
-                  MVP
+                <span className="rounded bg-amber-500/20 px-1.5 py-0.2 text-[9px] font-semibold text-amber-400 uppercase font-mono">
+                  Ember Agent
                 </span>
               </h1>
-              <p className="text-[10px] text-zinc-500">Autonomous PM Partner</p>
+              <p className="text-[10px] text-zinc-400">Project Secretary Familiar</p>
             </div>
           </div>
 
@@ -153,7 +154,7 @@ export function Chat() {
                   value={newProjectName}
                   onChange={(e) => setNewProjectName(e.target.value)}
                   autoFocus
-                  className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-2.5 py-1.5 text-xs text-zinc-100 placeholder-zinc-500 focus:border-indigo-500 focus:outline-none"
+                  className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-2.5 py-1.5 text-xs text-zinc-100 placeholder-zinc-500 focus:border-amber-500 focus:outline-none"
                 />
               </form>
             )}
@@ -161,7 +162,7 @@ export function Chat() {
             <div className="space-y-1 max-h-60 overflow-y-auto">
               {projects.length === 0 ? (
                 <div className="px-2 py-3 text-xs text-zinc-500">
-                  No projects yet. Ask the AI to create one!
+                  No projects yet. Ask Ember to create one!
                 </div>
               ) : (
                 projects.map((proj) => {
@@ -180,13 +181,13 @@ export function Chat() {
                       <div className="flex items-center gap-2 truncate">
                         <FolderKanban
                           className={`h-3.5 w-3.5 flex-shrink-0 ${
-                            isSelected ? "text-indigo-400" : "text-zinc-500"
+                            isSelected ? "text-amber-400" : "text-zinc-500"
                           }`}
                         />
                         <span className="truncate">{proj.name}</span>
                       </div>
                       {isSelected && (
-                        <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
                       )}
                     </button>
                   );
@@ -195,10 +196,10 @@ export function Chat() {
             </div>
           </div>
 
-          {/* Quick AI Actions */}
-          <div className="mt-6 px-2">
-            <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block mb-2">
-              Quick Suggestions
+          {/* Quick Secretary Actions */}
+          <div className="mt-4 px-2">
+            <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block mb-2">
+              Secretary Actions
             </span>
             <div className="space-y-1.5">
               <button
@@ -206,14 +207,29 @@ export function Chat() {
                 onClick={() =>
                   handleQuickPrompt(
                     activeProject
-                      ? `Break down ${activeProject.name} into actionable tasks for Sprint 1`
-                      : "Create a new project called Mobile App and break it into tasks"
+                      ? `Ember, give me today's daily standup briefing for ${activeProject.name}`
+                      : "Ember, prepare today's daily standup briefing"
                   )
                 }
-                className="w-full text-left p-2 rounded-md border border-zinc-800/80 bg-zinc-900/40 text-[11px] text-zinc-300 hover:bg-zinc-800/80 hover:border-zinc-700 transition flex items-center gap-2"
+                className="w-full text-left p-2 rounded-md border border-amber-500/20 bg-amber-500/5 text-[11px] text-amber-200 hover:bg-amber-500/15 hover:border-amber-500/40 transition flex items-center gap-2"
               >
-                <CheckSquare className="h-3.5 w-3.5 text-indigo-400 flex-shrink-0" />
-                <span>Break down into tasks</span>
+                <PixelSprite archetype="ember" state="idle" size="xs" />
+                <span className="font-medium">Daily Standup Briefing</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  handleQuickPrompt(
+                    activeProject
+                      ? `Perform a risk and bottleneck audit for ${activeProject.name}`
+                      : "Audit project risks and bottlenecks"
+                  )
+                }
+                className="w-full text-left p-2 rounded-md border border-cyan-500/20 bg-cyan-500/5 text-[11px] text-cyan-200 hover:bg-cyan-500/15 hover:border-cyan-500/40 transition flex items-center gap-2"
+              >
+                <PixelSprite archetype="specter" state="idle" size="xs" />
+                <span className="font-medium">Audit Risks & Blockers</span>
               </button>
 
               <button
@@ -251,7 +267,7 @@ export function Chat() {
 
         {/* Footer info */}
         <div className="px-2 pt-3 pb-2 border-t border-zinc-800/80 text-[11px] text-zinc-500 flex items-center justify-between">
-          <span className="font-mono text-[10px]">Gemini 3.6 Flash + SQLite</span>
+          <span className="font-mono text-[10px]">Ember (Gemini 3.6)</span>
           <button
             type="button"
             onClick={fetchProjects}
@@ -268,9 +284,7 @@ export function Chat() {
         {/* Header Bar */}
         <header className="h-14 border-b border-zinc-800/80 px-4 md:px-6 flex items-center justify-between bg-zinc-950/60 backdrop-blur-md z-10">
           <div className="flex items-center gap-3">
-            <div className="flex md:hidden h-7 w-7 items-center justify-center rounded-lg bg-indigo-600">
-              <Sparkles className="h-3.5 w-3.5 text-white" />
-            </div>
+            <PixelSprite archetype="ember" state={isLoading ? "thinking" : "idle"} size="sm" />
             <div>
               <h2 className="text-sm font-semibold text-zinc-100 flex items-center gap-2">
                 {activeProject ? activeProject.name : "All Projects"}
@@ -283,9 +297,27 @@ export function Chat() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-zinc-400">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>AI Ready</span>
+          <div className="flex items-center gap-3">
+            {activeProject && (
+              <button
+                type="button"
+                onClick={() => {
+                  sendMessage({
+                    text: `Ember, prepare today's daily standup briefing for ${activeProject.name}`,
+                  });
+                }}
+                disabled={isLoading}
+                className="flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-300 hover:bg-amber-500/20 disabled:opacity-50 transition shadow-sm"
+              >
+                <PixelSprite archetype="ember" state="idle" size="xs" />
+                <span>Daily Standup</span>
+              </button>
+            )}
+
+            <div className="flex items-center gap-2 text-xs text-zinc-400">
+              <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Secretary Ready</span>
+            </div>
           </div>
         </header>
 
@@ -293,31 +325,31 @@ export function Chat() {
         <div className="flex-1 overflow-y-auto px-4 md:px-8 py-6 space-y-6">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center max-w-md mx-auto py-12">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 mb-4 shadow-inner">
-                <Sparkles className="h-7 w-7" />
+              <div className="mb-4">
+                <PixelSprite archetype="ember" state="idle" size="xl" />
               </div>
-              <h3 className="text-base font-semibold text-zinc-100 mb-1">
-                Welcome to AI-Deck
+              <h3 className="text-base font-bold text-zinc-100 mb-1">
+                Meet Ember, Your Project Secretary
               </h3>
               <p className="text-xs text-zinc-400 mb-6 leading-relaxed">
-                Your conversational project management partner. Ask anything to plan,
-                break down tasks, view Kanban boards, or track team progress.
+                An autonomous familiar who keeps project momentum blazing. Run standups,
+                ingest messy meeting notes into tasks, and audit bottlenecks.
               </p>
 
               <div className="grid grid-cols-1 gap-2 w-full text-left">
                 {[
-                  "Create a project called 'Mobile E-Commerce App' and plan 2 sprints",
-                  "Break down user authentication and checkout flow into tasks",
+                  "Ember, prepare today's daily standup briefing",
+                  "Ingest these notes into tasks: 'Setup database schema, wire payment webhook, review auth flow'",
+                  "Perform a risk and bottleneck audit",
                   "Show the current Kanban board",
-                  "What tasks should we focus on next?",
                 ].map((hint, idx) => (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => handleQuickPrompt(hint)}
-                    className="p-2.5 rounded-lg border border-zinc-800 bg-zinc-900/60 text-xs text-zinc-300 hover:border-zinc-700 hover:bg-zinc-800/80 transition text-left"
+                    className="p-2.5 rounded-lg border border-zinc-800 bg-zinc-900/60 text-xs text-zinc-300 hover:border-zinc-700 hover:bg-zinc-800/80 transition text-left flex items-center justify-between"
                   >
-                    → {hint}
+                    <span>→ {hint}</span>
                   </button>
                 ))}
               </div>
@@ -334,8 +366,8 @@ export function Chat() {
                   }`}
                 >
                   {!isUser && (
-                    <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 mt-1">
-                      <Bot className="h-4 w-4" />
+                    <div className="flex-shrink-0 mt-1">
+                      <PixelSprite archetype="ember" state="idle" size="sm" />
                     </div>
                   )}
 
@@ -497,6 +529,90 @@ export function Chat() {
                         );
                       }
 
+                      // Generative UI: secretary_briefing
+                      if (toolName === "secretary_briefing") {
+                        if (isAvailable && output) {
+                          return (
+                            <div key={pIdx} className="text-left w-full">
+                              <SecretaryBriefing
+                                projectId={output.projectId}
+                                projectName={output.projectName}
+                                briefingDate={output.briefingDate}
+                                completionPercentage={output.completionPercentage}
+                                totalTasks={output.totalTasks}
+                                focusToday={output.focusToday || []}
+                                recentlyCompleted={output.recentlyCompleted || []}
+                                bottlenecks={output.bottlenecks || []}
+                                secretaryTip={output.secretaryTip}
+                                onTaskToggled={() => fetchProjects()}
+                              />
+                            </div>
+                          );
+                        }
+                        return (
+                          <div
+                            key={pIdx}
+                            className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 text-xs text-amber-300 flex items-center gap-2.5 text-left"
+                          >
+                            <PixelSprite archetype="ember" state="thinking" size="xs" />
+                            <span>Ember is preparing your daily standup briefing...</span>
+                          </div>
+                        );
+                      }
+
+                      // Generative UI: audit_risks
+                      if (toolName === "audit_risks") {
+                        if (isAvailable && output) {
+                          return (
+                            <div key={pIdx} className="text-left w-full">
+                              <RiskReport
+                                projectId={output.projectId}
+                                projectName={output.projectName}
+                                overallRisk={output.overallRisk}
+                                riskFlags={output.riskFlags || []}
+                                healthyCount={output.healthyCount || 0}
+                                auditTimestamp={output.auditTimestamp}
+                              />
+                            </div>
+                          );
+                        }
+                        return (
+                          <div
+                            key={pIdx}
+                            className="rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3 text-xs text-cyan-300 flex items-center gap-2.5 text-left"
+                          >
+                            <PixelSprite archetype="specter" state="thinking" size="xs" />
+                            <span>Specter is scanning for risks & bottlenecks...</span>
+                          </div>
+                        );
+                      }
+
+                      // Generative UI: ingest_notes
+                      if (toolName === "ingest_notes") {
+                        if (isAvailable && output) {
+                          return (
+                            <div key={pIdx} className="text-left w-full">
+                              <TaskList
+                                title={`Ingested Notes: ${output.sourceNotesSummary || "Extracted Tasks"}`}
+                                tasks={output.tasks || []}
+                                projectName={output.projectName}
+                                projectId={output.projectId}
+                                onTaskUpdated={() => fetchProjects()}
+                              />
+                            </div>
+                          );
+                        }
+                        return (
+                          <div
+                            key={pIdx}
+                            className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-3 text-xs text-zinc-400 flex items-center gap-2 text-left"
+                          >
+                            <PixelSprite archetype="ember" state="thinking" size="xs" />
+                            <span>Parsing notes into actionable tasks...</span>
+                          </div>
+                        );
+                      }
+
                       return null;
                     })}
                   </div>
@@ -513,13 +629,11 @@ export function Chat() {
 
           {isLoading && (
             <div className="flex gap-3 mr-auto items-center text-xs text-zinc-400">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
-                <Bot className="h-4 w-4" />
-              </div>
+              <PixelSprite archetype="ember" state="thinking" size="sm" />
               <div className="flex items-center gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 animate-bounce" />
-                <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:0.2s]" />
-                <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:0.4s]" />
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-bounce" />
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-bounce [animation-delay:0.2s]" />
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-bounce [animation-delay:0.4s]" />
               </div>
             </div>
           )}

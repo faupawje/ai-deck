@@ -187,6 +187,157 @@ export const showSummaryTool = tool({
   },
 });
 
+export const secretaryBriefingTool = tool({
+  description:
+    "Generate an executive morning standup & daily briefing for the active project. Scans priority items, stalled tasks, and highlights today's focus.",
+  inputSchema: z.object({
+    projectId: z.string().describe("The ID of the project to generate a briefing for"),
+  }),
+  execute: async ({ projectId }) => {
+    const project = db.getProjectById(projectId);
+    if (!project) return { success: false, error: "Project not found." };
+
+    const tasks = db.getTasks(projectId);
+    const summary = db.getProjectSummary(projectId);
+
+    // Focus items for today (urgent or high priority in todo or in_progress)
+    const focusToday = tasks
+      .filter((t) => (t.priority === "urgent" || t.priority === "high") && t.status !== "done")
+      .slice(0, 5);
+
+    // Tasks completed
+    const recentlyCompleted = tasks.filter((t) => t.status === "done").slice(0, 5);
+
+    // Potential bottlenecks (unassigned tasks or urgent tasks in review)
+    const bottlenecks = tasks.filter(
+      (t) => (t.priority === "urgent" && t.assignee === "Unassigned") || (t.status === "in_review" && t.priority === "high")
+    );
+
+    return {
+      success: true,
+      projectId,
+      projectName: project.name,
+      briefingDate: new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" }),
+      completionPercentage: summary?.completionPercentage || 0,
+      totalTasks: tasks.length,
+      focusToday,
+      recentlyCompleted,
+      bottlenecks,
+      secretaryTip:
+        focusToday.length > 3
+          ? "You have multiple high-priority items on deck. Recommend tackling the urgent items first before starting new tasks."
+          : "Workload looks balanced today. Good time to clear out backlog items!",
+    };
+  },
+});
+
+export const ingestNotesTool = tool({
+  description:
+    "Ingest and parse raw meeting notes, transcripts, or brain-dump text into structured project tasks and automatically save them.",
+  inputSchema: z.object({
+    projectId: z.string().describe("The ID of the project to add parsed tasks to"),
+    tasks: z.array(
+      z.object({
+        title: z.string().describe("Clear, actionable task title extracted from notes"),
+        description: z.string().optional().describe("Context or notes extracted"),
+        priority: z.enum(["low", "medium", "high", "urgent"]).default("medium"),
+        sprint: z.string().optional().default("Sprint 1"),
+        assignee: z.string().optional().default("Unassigned"),
+      })
+    ).describe("List of structured tasks extracted from the notes"),
+    sourceNotesSummary: z.string().describe("Brief 1-sentence summary of the meeting/notes ingested"),
+  }),
+  execute: async ({ projectId, tasks, sourceNotesSummary }) => {
+    const project = db.getProjectById(projectId);
+    if (!project) return { success: false, error: "Project not found." };
+
+    const created = db.createTasksBulk(
+      tasks.map((t, idx) => ({
+        project_id: projectId,
+        title: t.title,
+        description: t.description,
+        priority: t.priority,
+        status: "todo" as const,
+        sprint: t.sprint,
+        assignee: t.assignee,
+        sort_order: idx,
+      }))
+    );
+
+    return {
+      success: true,
+      projectId,
+      projectName: project.name,
+      sourceNotesSummary,
+      tasks: created,
+      count: created.length,
+      message: `Parsed & created ${created.length} actionable tasks from your notes.`,
+    };
+  },
+});
+
+export const auditRisksTool = tool({
+  description: "Perform an executive risk and bottleneck audit across the project tasks.",
+  inputSchema: z.object({
+    projectId: z.string().describe("The ID of the project to audit"),
+  }),
+  execute: async ({ projectId }) => {
+    const project = db.getProjectById(projectId);
+    if (!project) return { success: false, error: "Project not found." };
+
+    const tasks = db.getTasks(projectId);
+    const unassignedHigh = tasks.filter(
+      (t) => (t.priority === "urgent" || t.priority === "high") && t.assignee === "Unassigned" && t.status !== "done"
+    );
+    const inReviewCount = tasks.filter((t) => t.status === "in_review").length;
+    const todoCount = tasks.filter((t) => t.status === "todo").length;
+    const doneCount = tasks.filter((t) => t.status === "done").length;
+
+    const riskFlags: Array<{ severity: "low" | "medium" | "high"; title: string; detail: string }> = [];
+
+    if (unassignedHigh.length > 0) {
+      riskFlags.push({
+        severity: "high",
+        title: `${unassignedHigh.length} Unassigned High-Priority Tasks`,
+        detail: "Critical tasks are waiting without owners. Recommend immediate assignment.",
+      });
+    }
+
+    if (inReviewCount >= 4) {
+      riskFlags.push({
+        severity: "medium",
+        title: "Review Bottleneck",
+        detail: `${inReviewCount} tasks waiting in review. Blockers may form if reviews lag.`,
+      });
+    }
+
+    if (todoCount > 15 && doneCount < 3) {
+      riskFlags.push({
+        severity: "medium",
+        title: "Scope Creep Risk",
+        detail: "Large influx of To-Do items with low completion velocity.",
+      });
+    }
+
+    const overallRisk =
+      riskFlags.some((f) => f.severity === "high")
+        ? "high"
+        : riskFlags.length > 0
+        ? "medium"
+        : "low";
+
+    return {
+      success: true,
+      projectId,
+      projectName: project.name,
+      overallRisk,
+      riskFlags,
+      healthyCount: tasks.filter((t) => t.status === "done").length,
+      auditTimestamp: new Date().toLocaleTimeString(),
+    };
+  },
+});
+
 export const projectTools = {
   create_project: createProjectTool,
   list_projects: listProjectsTool,
@@ -196,4 +347,7 @@ export const projectTools = {
   delete_task: deleteTaskTool,
   show_board: showBoardTool,
   show_summary: showSummaryTool,
+  secretary_briefing: secretaryBriefingTool,
+  ingest_notes: ingestNotesTool,
+  audit_risks: auditRisksTool,
 };
