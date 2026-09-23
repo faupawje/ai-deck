@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed": "curl -s http://localhost:3000/api/seed?reset=true"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.76",

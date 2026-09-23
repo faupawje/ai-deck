@@ -14,6 +14,7 @@ import {
   User as UserIcon,
   Plus,
   RefreshCw,
+  Database,
 } from "lucide-react";
 import { Project } from "@/lib/db";
 import { TaskList } from "./generative/task-list";
@@ -25,9 +26,11 @@ import { RiskReport } from "./generative/risk-report";
 import { MarkdownRenderer } from "./markdown-renderer";
 import { PixelSprite } from "./agents/pixel-sprite";
 
-export function Chat() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [activeProject, setActiveProject] = useState<Project | null>(null);
+export function Chat({ initialProjects = [] }: { initialProjects?: Project[] }) {
+  const [projects, setProjects] = useState<Project[]>(initialProjects);
+  const [activeProject, setActiveProject] = useState<Project | null>(
+    initialProjects.length > 0 ? initialProjects[0] : null
+  );
   const [isCreatingProject, setIsCreatingProject] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -83,8 +86,33 @@ export function Chat() {
     fetchProjects();
   };
 
-  const handleQuickPrompt = (prompt: string) => {
-    setInput(prompt);
+  const [isSeeding, setIsSeeding] = useState(false);
+
+  const handleSeedDemoData = async () => {
+    setIsSeeding(true);
+    try {
+      const res = await fetch("/api/seed?reset=true");
+      if (res.ok) {
+        const data = await res.json();
+        setProjects(data.projects || []);
+        if (data.projects && data.projects.length > 0) {
+          setActiveProject(data.projects[0]);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to seed demo data:", err);
+    } finally {
+      setIsSeeding(false);
+    }
+  };
+
+  const handleQuickPrompt = async (prompt: string) => {
+    if (status === "submitted" || status === "streaming") return;
+    setInput("");
+    await sendMessage({
+      text: prompt,
+    });
+    fetchProjects();
   };
 
   const handleCreateQuickProject = async (e: React.FormEvent) => {
@@ -136,14 +164,26 @@ export function Chat() {
               <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
                 Projects
               </span>
-              <button
-                type="button"
-                onClick={() => setIsCreatingProject(!isCreatingProject)}
-                className="text-zinc-400 hover:text-zinc-100 transition"
-                title="Create Project"
-              >
-                <Plus className="h-3.5 w-3.5" />
-              </button>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={handleSeedDemoData}
+                  disabled={isSeeding}
+                  className="text-zinc-400 hover:text-amber-400 transition text-[10px] font-medium flex items-center gap-1 px-1.5 py-0.5 rounded border border-zinc-800 bg-zinc-900/60 hover:border-amber-500/30"
+                  title="Reset & Load Full Demo Data with all features"
+                >
+                  <Database className="h-3 w-3 text-amber-400" />
+                  <span>{isSeeding ? "Seeding..." : "Seed Demo"}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsCreatingProject(!isCreatingProject)}
+                  className="text-zinc-400 hover:text-zinc-100 transition p-1"
+                  title="Create Project"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                </button>
+              </div>
             </div>
 
             {isCreatingProject && (
@@ -336,20 +376,65 @@ export function Chat() {
                 ingest messy meeting notes into tasks, and audit bottlenecks.
               </p>
 
-              <div className="grid grid-cols-1 gap-2 w-full text-left">
+              <div className="grid grid-cols-1 gap-2.5 w-full text-left">
                 {[
-                  "Ember, prepare today's daily standup briefing",
-                  "Ingest these notes into tasks: 'Setup database schema, wire payment webhook, review auth flow'",
-                  "Perform a risk and bottleneck audit",
-                  "Show the current Kanban board",
-                ].map((hint, idx) => (
+                  {
+                    icon: "⚡",
+                    title: "Run Daily Standup Briefing",
+                    desc: "Analyzes focus tasks, recent wins, and bottlenecks",
+                    prompt: activeProject
+                      ? `Ember, prepare today's daily standup briefing for ${activeProject.name}`
+                      : "Ember, prepare today's daily standup briefing",
+                  },
+                  {
+                    icon: "🛡️",
+                    title: "Audit Risks & Bottlenecks",
+                    desc: "Specter scans for stale tasks, scope creep, and unassigned urgent items",
+                    prompt: activeProject
+                      ? `Perform a risk and bottleneck audit for ${activeProject.name}`
+                      : "Audit project risks and bottlenecks",
+                  },
+                  {
+                    icon: "📋",
+                    title: "Open Interactive Kanban Board",
+                    desc: "View 4-column agile board with real-time status updates",
+                    prompt: activeProject
+                      ? `Show me the Kanban board for ${activeProject.name}`
+                      : "Show me the project board",
+                  },
+                  {
+                    icon: "📊",
+                    title: "Project Metrics & Priority Stats",
+                    desc: "Visual progress percentage and sprint task breakdown",
+                    prompt: activeProject
+                      ? `Show progress and metrics summary for ${activeProject.name}`
+                      : "Summarize our project progress",
+                  },
+                  {
+                    icon: "📥",
+                    title: "Ingest Unstructured Meeting Notes",
+                    desc: "Automatically extracts and categorizes tasks into SQLite",
+                    prompt: activeProject
+                      ? `Ingest these notes into tasks for ${activeProject.name}: 'Fix particle emitter VRAM memory leak, implement BVH audio occlusion, add headless CI rendering benchmark'`
+                      : "Ingest these notes into tasks: 'Setup database schema, wire payment webhook, review auth flow'",
+                  },
+                ].map((item, idx) => (
                   <button
                     key={idx}
                     type="button"
-                    onClick={() => handleQuickPrompt(hint)}
-                    className="p-2.5 rounded-lg border border-zinc-800 bg-zinc-900/60 text-xs text-zinc-300 hover:border-zinc-700 hover:bg-zinc-800/80 transition text-left flex items-center justify-between"
+                    onClick={() => handleQuickPrompt(item.prompt)}
+                    className="p-3 rounded-lg border border-zinc-800/80 bg-zinc-900/50 hover:border-amber-500/40 hover:bg-zinc-800/80 transition text-left group"
                   >
-                    <span>→ {hint}</span>
+                    <div className="flex items-center justify-between mb-0.5">
+                      <span className="text-xs font-semibold text-zinc-200 group-hover:text-amber-300 transition flex items-center gap-1.5">
+                        <span>{item.icon}</span>
+                        <span>{item.title}</span>
+                      </span>
+                      <span className="text-[10px] text-zinc-500 group-hover:text-zinc-300">Run →</span>
+                    </div>
+                    <p className="text-[11px] text-zinc-400 leading-tight pl-5">
+                      {item.desc}
+                    </p>
                   </button>
                 ))}
               </div>
