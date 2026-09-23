@@ -15,6 +15,8 @@ import {
   Plus,
   RefreshCw,
   Database,
+  FileText,
+  Trash2,
 } from "lucide-react";
 import { Project } from "@/lib/db";
 import { TaskList } from "./generative/task-list";
@@ -23,6 +25,7 @@ import { ProjectCard } from "./generative/project-card";
 import { SummaryChart } from "./generative/summary-chart";
 import { SecretaryBriefing } from "./generative/secretary-briefing";
 import { RiskReport } from "./generative/risk-report";
+import { ProjectCharterCard } from "./generative/project-charter";
 import { MarkdownRenderer } from "./markdown-renderer";
 import { PixelSprite } from "./agents/pixel-sprite";
 
@@ -55,7 +58,7 @@ export function Chat({ initialProjects = [] }: { initialProjects?: Project[] }) 
     fetchProjects();
   }, []);
 
-  const { messages, sendMessage, status, error } = useChat({
+  const { messages, setMessages, sendMessage, status, error } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
       body: {
@@ -63,6 +66,43 @@ export function Chat({ initialProjects = [] }: { initialProjects?: Project[] }) 
       },
     }),
   });
+
+  // Load project messages from SQLite whenever activeProject changes
+  const loadProjectMessages = async (projectId: string) => {
+    try {
+      const res = await fetch(`/api/messages?projectId=${projectId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setMessages(data.messages || []);
+      }
+    } catch (err) {
+      console.error("Failed to load project messages:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (activeProject?.id) {
+      loadProjectMessages(activeProject.id);
+    } else {
+      setMessages([]);
+    }
+  }, [activeProject?.id]);
+
+  const handleClearThread = async () => {
+    if (!activeProject) return;
+    if (
+      !confirm(
+        `Start a fresh thread for "${activeProject.name}"? (Tasks, Charter, and Project are fully preserved)`
+      )
+    )
+      return;
+    try {
+      await fetch(`/api/messages?projectId=${activeProject.id}`, { method: "DELETE" });
+      setMessages([]);
+    } catch (err) {
+      console.error("Failed to clear messages:", err);
+    }
+  };
 
   const [input, setInput] = useState("");
 
@@ -262,6 +302,21 @@ export function Chat({ initialProjects = [] }: { initialProjects?: Project[] }) 
                 onClick={() =>
                   handleQuickPrompt(
                     activeProject
+                      ? `Show me the Project Charter (ToR) and scope boundaries for ${activeProject.name}`
+                      : "Show project charter and scope boundaries"
+                  )
+                }
+                className="w-full text-left p-2 rounded-md border border-amber-500/20 bg-amber-500/5 text-[11px] text-amber-200 hover:bg-amber-500/15 hover:border-amber-500/40 transition flex items-center gap-2"
+              >
+                <FileText className="h-3.5 w-3.5 text-amber-400 flex-shrink-0" />
+                <span className="font-medium">Project Charter (ToR)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  handleQuickPrompt(
+                    activeProject
                       ? `Perform a risk and bottleneck audit for ${activeProject.name}`
                       : "Audit project risks and bottlenecks"
                   )
@@ -337,26 +392,56 @@ export function Chat({ initialProjects = [] }: { initialProjects?: Project[] }) 
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
             {activeProject && (
-              <button
-                type="button"
-                onClick={() => {
-                  sendMessage({
-                    text: `Ember, prepare today's daily standup briefing for ${activeProject.name}`,
-                  });
-                }}
-                disabled={isLoading}
-                className="flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-300 hover:bg-amber-500/20 disabled:opacity-50 transition shadow-sm"
-              >
-                <PixelSprite archetype="ember" state="idle" size="xs" />
-                <span>Daily Standup</span>
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleQuickPrompt(
+                      `Show me the Project Charter (ToR) and scope boundaries for ${activeProject.name}`
+                    );
+                  }}
+                  disabled={isLoading}
+                  className="flex items-center gap-1.5 rounded-lg border border-zinc-700/80 bg-zinc-900/60 px-2.5 py-1 text-xs font-medium text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100 disabled:opacity-50 transition shadow-sm"
+                  title="View Terms of Reference / Project Charter"
+                >
+                  <FileText className="h-3.5 w-3.5 text-amber-400" />
+                  <span className="hidden sm:inline">Project Charter</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleQuickPrompt(
+                      `Ember, prepare today's daily standup briefing for ${activeProject.name}`
+                    );
+                  }}
+                  disabled={isLoading}
+                  className="flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-300 hover:bg-amber-500/20 disabled:opacity-50 transition shadow-sm"
+                >
+                  <PixelSprite archetype="ember" state="idle" size="xs" />
+                  <span>Daily Standup</span>
+                </button>
+
+                {messages.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleClearThread}
+                    disabled={isLoading}
+                    className="flex items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-900/40 px-2 py-1 text-xs text-zinc-400 hover:text-rose-300 hover:border-rose-500/30 hover:bg-rose-500/10 transition"
+                    title="Clear thread history (tasks & charter preserved)"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                    <span className="hidden lg:inline text-[11px]">Clear</span>
+                  </button>
+                )}
+              </>
             )}
 
             <div className="flex items-center gap-2 text-xs text-zinc-400">
               <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Secretary Ready</span>
+              <span className="hidden md:inline">Secretary Ready</span>
             </div>
           </div>
         </header>
@@ -430,6 +515,14 @@ export function Chat({ initialProjects = [] }: { initialProjects?: Project[] }) 
                     prompt: activeProject
                       ? `Ember, prepare today's daily standup briefing for ${activeProject.name}`
                       : "Ember, prepare today's daily standup briefing",
+                  },
+                  {
+                    icon: "📜",
+                    title: "View Project Charter (ToR)",
+                    desc: "Inspect strategic objectives, key deliverables, and in/out scope boundaries",
+                    prompt: activeProject
+                      ? `Show me the Project Charter (ToR) and scope boundaries for ${activeProject.name}`
+                      : "Show project charter and scope boundaries",
                   },
                   {
                     icon: "🛡️",
@@ -739,6 +832,30 @@ export function Chat({ initialProjects = [] }: { initialProjects?: Project[] }) 
                           >
                             <PixelSprite archetype="ember" state="thinking" size="xs" />
                             <span>Parsing notes into actionable tasks...</span>
+                          </div>
+                        );
+                      }
+
+                      // Generative UI: draft_charter or show_charter
+                      if (toolName === "draft_charter" || toolName === "show_charter") {
+                        if (isAvailable && output && output.charter) {
+                          return (
+                            <div key={pIdx} className="text-left w-full">
+                              <ProjectCharterCard
+                                projectId={output.projectId}
+                                projectName={output.projectName}
+                                charter={output.charter}
+                              />
+                            </div>
+                          );
+                        }
+                        return (
+                          <div
+                            key={pIdx}
+                            className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3 text-xs text-amber-300 flex items-center gap-2.5 text-left"
+                          >
+                            <PixelSprite archetype="ember" state="thinking" size="xs" />
+                            <span>Ember is assembling the Project Charter & Terms of Reference...</span>
                           </div>
                         );
                       }

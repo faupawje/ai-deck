@@ -10,6 +10,8 @@ import {
 import { projectTools } from "@/lib/tools";
 import { buildSystemPrompt } from "@/lib/system-prompt";
 
+import * as db from "@/lib/db";
+
 // Allow streaming responses up to 60 seconds
 export const maxDuration = 60;
 
@@ -31,6 +33,26 @@ export async function POST(req: Request) {
 
     const { messages, projectId }: { messages: UIMessage[]; projectId?: string } = await req.json();
 
+    // Persist incoming user message to SQLite
+    const lastUserMsg = messages[messages.length - 1];
+    if (lastUserMsg && lastUserMsg.role === "user") {
+      const userText =
+        lastUserMsg.parts
+          ?.filter((p: any) => p.type === "text")
+          .map((p: any) => p.text)
+          .join("") ||
+        (lastUserMsg as any).content ||
+        "";
+      if (userText) {
+        db.saveMessage({
+          id: lastUserMsg.id,
+          project_id: projectId || null,
+          role: "user",
+          content: userText,
+        });
+      }
+    }
+
     const systemPrompt = buildSystemPrompt(projectId);
     const modelName = process.env.GEMINI_MODEL || "gemini-3.7-flash";
 
@@ -40,6 +62,26 @@ export async function POST(req: Request) {
       messages: await convertToModelMessages(messages),
       tools: projectTools,
       stopWhen: isStepCount(5),
+      onFinish: async (event: any) => {
+        try {
+          const text = event.text || "";
+          const toolResults = event.toolResults || [];
+          const toolPayloads = toolResults.map((tr: any) => ({
+            name: tr.toolName,
+            id: tr.toolCallId,
+            result: tr.result ?? tr.output,
+          }));
+
+          db.saveMessage({
+            project_id: projectId || null,
+            role: "assistant",
+            content: text,
+            tool_calls_json: toolPayloads.length > 0 ? JSON.stringify(toolPayloads) : undefined,
+          });
+        } catch (dbErr) {
+          console.error("Failed to persist assistant message to SQLite:", dbErr);
+        }
+      },
     });
 
     return createUIMessageStreamResponse({

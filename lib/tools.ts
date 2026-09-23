@@ -338,6 +338,104 @@ export const auditRisksTool = tool({
   },
 });
 
+export const draftCharterTool = tool({
+  description:
+    "Draft, set, or update the Terms of Reference (ToR) / Project Charter. Use this to establish project goals, background, deliverables, and scope boundaries for ANY project domain (software, marketing, research, event, consulting).",
+  inputSchema: z.object({
+    projectId: z.string().describe("The ID of the project"),
+    background: z.string().describe("Problem statement, background context, and motivation for the project"),
+    objectives: z.array(z.string()).describe("List of clear, high-level strategic objectives (Why are we doing this?)"),
+    deliverables: z
+      .array(
+        z.object({
+          title: z.string().describe("Title of the deliverable output"),
+          description: z.string().optional().describe("Detailed description of what is produced"),
+          acceptanceCriteria: z.string().optional().describe("Measurable acceptance criteria for completion"),
+          status: z.enum(["pending", "in_progress", "completed"]).default("pending"),
+        })
+      )
+      .describe("List of tangible deliverables and outputs"),
+    scopeIn: z.array(z.string()).describe("Boundaries: what is explicitly IN-SCOPE"),
+    scopeOut: z.array(z.string()).describe("Boundaries: what is explicitly OUT-OF-SCOPE (non-goals to prevent scope creep)"),
+    successMetrics: z.array(z.string()).describe("Measurable KPIs or success criteria"),
+    targetAudience: z.string().optional().describe("Target beneficiaries, stakeholders, or users"),
+    estimatedTimeline: z.string().optional().describe("High-level timeline or key milestone deadlines"),
+  }),
+  execute: async ({
+    projectId,
+    background,
+    objectives,
+    deliverables,
+    scopeIn,
+    scopeOut,
+    successMetrics,
+    targetAudience,
+    estimatedTimeline,
+  }) => {
+    const project = db.getProjectById(projectId);
+    if (!project) {
+      return { success: false, error: `Project "${projectId}" not found.` };
+    }
+
+    const charter: db.ProjectCharter = {
+      background,
+      objectives,
+      deliverables,
+      scopeIn,
+      scopeOut,
+      successMetrics,
+      targetAudience,
+      estimatedTimeline,
+    };
+
+    const updated = db.updateProjectCharter(projectId, charter);
+    return {
+      success: true,
+      projectId,
+      projectName: project.name,
+      charter,
+      message: `Project Charter (ToR) for "${project.name}" has been drafted and saved to the database.`,
+    };
+  },
+});
+
+export const showCharterTool = tool({
+  description:
+    "View the Terms of Reference (ToR) / Project Charter for the current project. Spawns an executive document card displaying goals, deliverables, and scope boundaries.",
+  inputSchema: z.object({
+    projectId: z.string().describe("The ID of the project"),
+  }),
+  execute: async ({ projectId }) => {
+    const project = db.getProjectById(projectId);
+    if (!project) {
+      return { success: false, error: `Project "${projectId}" not found.` };
+    }
+
+    const charter = db.getProjectCharter(projectId);
+    return {
+      success: true,
+      projectId,
+      projectName: project.name,
+      hasCharter: !!charter,
+      charter: charter || {
+        background: `No formal Terms of Reference (ToR) drafted yet for ${project.name}.`,
+        objectives: ["Define strategic project goals", "Identify key deliverables"],
+        deliverables: [
+          {
+            title: "Initial Project Baseline",
+            description: "Define scope and initial task backlog",
+            status: "pending",
+          },
+        ],
+        scopeIn: ["Initial discovery and requirements gathering"],
+        scopeOut: ["Unspecified scope expansions"],
+        successMetrics: ["Deliverable acceptance by stakeholders"],
+        estimatedTimeline: "Q4 2026",
+      },
+    };
+  },
+});
+
 export const projectTools = {
   create_project: createProjectTool,
   list_projects: listProjectsTool,
@@ -350,4 +448,6 @@ export const projectTools = {
   secretary_briefing: secretaryBriefingTool,
   ingest_notes: ingestNotesTool,
   audit_risks: auditRisksTool,
+  draft_charter: draftCharterTool,
+  show_charter: showCharterTool,
 };

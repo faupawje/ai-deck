@@ -24,6 +24,7 @@ function initSchema(db: Database.Database) {
       name TEXT NOT NULL,
       description TEXT DEFAULT '',
       status TEXT DEFAULT 'active' CHECK (status IN ('active', 'paused', 'completed', 'archived')),
+      charter_json TEXT DEFAULT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
@@ -57,14 +58,43 @@ function initSchema(db: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
     CREATE INDEX IF NOT EXISTS idx_messages_project_id ON messages(project_id);
   `);
+
+  // Migration: Ensure charter_json column exists
+  try {
+    const cols = db.pragma("table_info(projects)") as Array<{ name: string }>;
+    if (!cols.some((c) => c.name === "charter_json")) {
+      db.exec("ALTER TABLE projects ADD COLUMN charter_json TEXT DEFAULT NULL");
+    }
+  } catch (err) {
+    console.error("Migration error for charter_json:", err);
+  }
 }
 
 // Data Types
+export interface ProjectCharterDeliverable {
+  title: string;
+  description?: string;
+  acceptanceCriteria?: string;
+  status?: "pending" | "in_progress" | "completed";
+}
+
+export interface ProjectCharter {
+  background: string;
+  objectives: string[];
+  deliverables: ProjectCharterDeliverable[];
+  scopeIn: string[];
+  scopeOut: string[];
+  successMetrics: string[];
+  targetAudience?: string;
+  estimatedTimeline?: string;
+}
+
 export interface Project {
   id: string;
   name: string;
   description: string;
   status: 'active' | 'paused' | 'completed' | 'archived';
+  charter_json?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -149,6 +179,25 @@ export function deleteProject(id: string): boolean {
   const db = getDb();
   const res = db.prepare("DELETE FROM projects WHERE id = ?").run(id);
   return res.changes > 0;
+}
+
+export function getProjectCharter(projectId: string): ProjectCharter | null {
+  const project = getProjectById(projectId);
+  if (!project || !project.charter_json) return null;
+  try {
+    return JSON.parse(project.charter_json) as ProjectCharter;
+  } catch {
+    return null;
+  }
+}
+
+export function updateProjectCharter(projectId: string, charter: ProjectCharter): Project | undefined {
+  const db = getDb();
+  const jsonStr = JSON.stringify(charter);
+  db.prepare(`
+    UPDATE projects SET charter_json = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+  `).run(jsonStr, projectId);
+  return getProjectById(projectId);
 }
 
 // ---------------- Task Queries ----------------
@@ -339,4 +388,14 @@ export function saveMessage(data: {
   `).run(id, data.project_id, data.role, data.content, tool_calls_json);
 
   return db.prepare("SELECT * FROM messages WHERE id = ?").get(id) as MessageRecord;
+}
+
+export function clearMessages(projectId: string | null): boolean {
+  const db = getDb();
+  if (projectId) {
+    const res = db.prepare("DELETE FROM messages WHERE project_id = ?").run(projectId);
+    return res.changes >= 0;
+  }
+  const res = db.prepare("DELETE FROM messages").run();
+  return res.changes >= 0;
 }

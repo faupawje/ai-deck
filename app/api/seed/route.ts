@@ -1,5 +1,14 @@
 import { NextResponse } from "next/server";
-import { getDb, createProject, createTask, saveMessage, getTasks, getAllProjects } from "@/lib/db";
+import {
+  getDb,
+  createProject,
+  createTask,
+  saveMessage,
+  getTasks,
+  getAllProjects,
+  updateProjectCharter,
+  ProjectCharter,
+} from "@/lib/db";
 
 export async function GET(req: Request) {
   return handleSeed(req);
@@ -24,32 +33,118 @@ async function handleSeed(req: Request) {
 
     // 1. Primary Flagship: AI-Deck Itself!
     const aideckId = "proj_aideck_platform";
+    const aideckCharter: ProjectCharter = {
+      background:
+        "Modern project management tools (Jira, Linear) force creators to spend hours filling out manual forms, configuring tickets, and managing boards. AI-Deck replaces this friction with an autonomous Project Secretary ('Ember') who manages the project through natural conversation and interactive Generative UI widgets.",
+      objectives: [
+        "Eliminate manual form-filling with chat-first task planning & note ingestion",
+        "Render living, interactive agile cards (Kanban, Standup, Risk Audit) directly inside the conversation stream",
+        "Provide zero-latency local-first persistence with an embedded SQLite engine",
+        "Introduce non-human abstract familiar agents (Ember & Specter) with pixel-art reactive animations",
+      ],
+      deliverables: [
+        {
+          title: "Embedded SQLite Data Engine",
+          description: "High-performance WAL-mode relational database layer for projects, tasks, charters, and messages.",
+          acceptanceCriteria: "Sub-50ms query and update latency on local workstation.",
+          status: "completed",
+        },
+        {
+          title: "Generative UI Agile Suite",
+          description: "Interactive Kanban board, task list, summary charts, and standup briefing cards.",
+          acceptanceCriteria: "Cards update SQLite state directly on click without page reload.",
+          status: "completed",
+        },
+        {
+          title: "Autonomous Pixel Sprite Familiars",
+          description: "Animated pixel-art SVG characters (Ember Flame Spirit & Specter Network Ghost).",
+          acceptanceCriteria: "Pure SVG with reactive states (idle, thinking, celebrating, alert).",
+          status: "completed",
+        },
+        {
+          title: "Persistent Conversation & ToR Governance",
+          description: "Chat history persistence scoped per project with full Terms of Reference (ToR) tracking.",
+          acceptanceCriteria: "Conversation reloads on browser refresh; Ember audits tasks against ToR scope.",
+          status: "in_progress",
+        },
+      ],
+      scopeIn: [
+        "Local workstation single-tenant workspace",
+        "Vercel AI SDK v7 streaming with Google Gemini 3.7 Flash",
+        "Living Generative UI widgets connected to SQLite",
+        "Terms of Reference (ToR) project governance for any domain",
+      ],
+      scopeOut: [
+        "Multi-tenant cloud billing & payment processing (v1 non-goal)",
+        "Enterprise SAML/SSO authentication (v1 non-goal)",
+        "Mobile native app wrappers (focus on responsive web)",
+      ],
+      successMetrics: [
+        "Zero data loss across browser refresh and restart",
+        "1-click daily standup generated in under 3 seconds",
+        "100% testable locally with built-in demo dataset",
+      ],
+      targetAudience: "Solo developers, founders, agile teams, and project managers",
+      estimatedTimeline: "Sprints 1–4 (Target Completion: Q4 2026)",
+    };
+
     let aideckProject = db.prepare("SELECT * FROM projects WHERE id = ?").get(aideckId);
     if (!aideckProject) {
       db.prepare(`
-        INSERT INTO projects (id, name, description, status, created_at, updated_at)
-        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        INSERT INTO projects (id, name, description, status, charter_json, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       `).run(
         aideckId,
         "AI-Deck: AI Project Management Platform",
-        "Autonomous project secretary with generative UI cards and animated pixel-art familiars backed by Gemini 3.6 Flash and SQLite.",
-        "active"
+        "Autonomous project secretary with generative UI cards and animated pixel-art familiars backed by Gemini 3.7 Flash and SQLite.",
+        "active",
+        JSON.stringify(aideckCharter)
       );
+    } else {
+      updateProjectCharter(aideckId, aideckCharter);
     }
 
     // 2. Accio-Style Workflow Automation (Secondary Active)
     const accioId = "proj_workflow_automation";
+    const accioCharter: ProjectCharter = {
+      background:
+        "Team members miss updates when standup insights stay locked in personal tools. This integration broadcasts automated morning summaries directly to team Slack channels.",
+      objectives: [
+        "Automate 9:00 AM daily standup broadcasts to #engineering-sync",
+        "Alert the lead on critical unassigned blockers via Slack Bot notifications",
+      ],
+      deliverables: [
+        {
+          title: "Slack Incoming Webhook Dispatcher",
+          description: "Configurable webhook endpoint with test connection validator.",
+          status: "completed",
+        },
+        {
+          title: "Slack Block Kit Card Generator",
+          description: "Converts Ember's generative standup cards into interactive Slack cards.",
+          status: "in_progress",
+        },
+      ],
+      scopeIn: ["Slack incoming webhooks", "Weekday cron scheduling"],
+      scopeOut: ["Discord and Microsoft Teams support (v2)"],
+      successMetrics: ["100% delivery rate to designated Slack channel"],
+      estimatedTimeline: "Sprint 2 (Q4 2026)",
+    };
+
     let accioProject = db.prepare("SELECT * FROM projects WHERE id = ?").get(accioId);
     if (!accioProject) {
       db.prepare(`
-        INSERT INTO projects (id, name, description, status, created_at, updated_at)
-        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        INSERT INTO projects (id, name, description, status, charter_json, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       `).run(
         accioId,
         "Workflow Automation & Slack Dispatcher",
         "Autonomous triggers that export daily standup summaries and blocker audits to company Slack channels.",
-        "active"
+        "active",
+        JSON.stringify(accioCharter)
       );
+    } else {
+      updateProjectCharter(accioId, accioCharter);
     }
 
     // 3. Vercel AI SDK v7 Upgrade (Completed Milestone)
